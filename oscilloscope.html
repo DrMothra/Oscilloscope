@@ -22,8 +22,60 @@
 <!-- Stats output -->
 <div id="Stats-output">
 </div>
-<!-- Div which will hold the Output -->
-<div id="WebGL-output">
+<div class="title">
+    <p>Oscilloscope</p>
+</div>
+<div class="layout pure-g control">
+    <!-- Channel selection -->
+    <div class="channels pure-u-1-5">
+        <p class="header">Data Channels</p>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-1-2 header">
+                    <span>Ch. 1</span>
+                    <button id="chan1" class="button-xsmall pure-button button-control">Enable</button>
+                </div>
+                <div class="pure-u-1-2 dataStatus">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-1-2 header">
+                    <span>Ch. 2</span>
+                    <button id="chan2" class="button-xsmall pure-button button-control">Enable</button>
+                </div>
+                <div class="pure-u-1-2 dataStatus">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-1-2 header">
+                    <span>Ch. 3</span>
+                    <button id="chan3" class="button-xsmall pure-button button-control">Enable</button>
+                </div>
+                <div class="pure-u-1-2 dataStatus">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Div which will hold the Output -->
+    <div id="WebGL-output" class="pure-u-3-5">
+    </div>
+    <!-- Controls -->
+    <div class="controls pure-u-1-5">
+        <button id="temp3" class="button-xsmall pure-button button-control"><<</button>
+        <button id="temp4" class="button-xsmall pure-button button-control"><<</button>
+    </div>
+    <div class="footer">
+        <p> </p>
+    </div>
 </div>
 </body>
 </html>

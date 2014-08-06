@@ -31,13 +31,16 @@ BaseApp.prototype.init = function(container) {
     this.projector = new THREE.Projector();
     this.stats = initStats();
     this.statsShowing = true;
+    //DEBUG
+    $("#Stats-output").hide();
+    this.statsShowing = false;
 };
 
 BaseApp.prototype.createRenderer = function() {
     this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     this.renderer.setClearColor(0x5c5f64, 1.0);
     this.renderer.shadowMapEnabled = true;
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(this.container.clientWidth, window.innerHeight*0.8);
     this.container.appendChild( this.renderer.domElement );
     var _this = this;
 
@@ -103,7 +106,7 @@ BaseApp.prototype.createScene = function() {
 BaseApp.prototype.createCamera = function() {
 
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this.camera.position.set( 0, 0, 330 );
+    this.camera.position.set( 0, 0, 100 );
 
     console.log('dom =', this.renderer.domElement);
 };
@@ -122,7 +125,7 @@ BaseApp.prototype.createControls = function() {
 
     this.controls.keys = [ 65, 83, 68 ];
 
-    var lookAt = new THREE.Vector3(0, -60, 0);
+    var lookAt = new THREE.Vector3(0, 0, 0);
     this.controls.setLookAt(lookAt);
 };
 

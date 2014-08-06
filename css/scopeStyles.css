@@ -1,7 +1,35 @@
 /*Styles for oscilloscope vis app */
 
-body {
+#WebGL-output {
     /* set margin to 0 and overflow to hidden, to go fullscreen */
     margin: 0;
+    /*overflow: hidden;*/
+}
+canvas {
+    border-radius: 15px;
+}
+.button-xsmall {
+    font-size: 70%;
+}
+.header {
+    text-align: center;
+}
+.footer {
+    width: 100%;
+}
+.channels {
+
+}
+.title {
+    width: 100%;
+}
+.dataStatus {
+    width: 12%;
     overflow: hidden;
+    background-color: #ff0000;
+    margin: 5px 35px;
+}
+.infoCell {
+    /*margin-top: 10px;*/
+    margin-bottom: 10px;
 }
