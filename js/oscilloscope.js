@@ -46,12 +46,25 @@ Oscilloscope.prototype.createScene = function() {
     //Init base createsScene
     BaseApp.prototype.createScene.call(this);
 
+    //Load background grid
+    var gridGeom = new THREE.PlaneGeometry(150, 100);
+    var texture = THREE.ImageUtils.loadTexture("images/grid.png");
+    var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
+    var grid = new THREE.Mesh(gridGeom, gridMaterial);
+    this.scene.add(grid);
+
     this.generateData();
 };
 
 Oscilloscope.prototype.generateData = function() {
     //Generate 3 forms of data for now
     //Power data, sine wave and square wave
+
+    //Create main data group
+    var dataGroup = new THREE.Object3D();
+    dataGroup.name = 'dataStreams';
+    dataGroup.position.x = -139;
+
     var powerData = [
             0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0331, 0.0329, 0.0329, 0.0330, 0.0329, 0.0331, 0.0330, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329,
             0.0330, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0330, 0.0330, 0.0329, 0.0332, 0.0330, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0329, 0.0330, 0.0330, 0.0329, 0.0329,
@@ -131,16 +144,15 @@ Oscilloscope.prototype.generateData = function() {
         var lineMesh = new THREE.Line(geometry, material);
         lineMesh.name = 'lineMesh' + stream;
         lineMesh.visible = currentData.enabled;
-        var dataGroup = new THREE.Object3D();
-        dataGroup.name = 'data' + stream;
-        dataGroup.position.x = -139;
         dataGroup.add(lineMesh);
-        this.scene.add(dataGroup);
     }
+    this.scene.add(dataGroup);
 };
 
-Oscilloscope.prototype.displayChannel = function(channel) {
+Oscilloscope.prototype.displayChannel = function(id) {
     //Toggle display for given channel
+    //Remove 'chan'
+    var channel = parseInt(id.substr(4, id.length-4));
     --channel;
     if(channel < 0) return;
 
@@ -148,6 +160,28 @@ Oscilloscope.prototype.displayChannel = function(channel) {
     if(line) {
         line.visible = !line.visible;
         this.dataStreams[channel].enabled = line.visible;
+        //Alter line status
+        ++channel;
+        var elem = 'chan'+channel+'Status';
+        $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
+    }
+};
+
+Oscilloscope.prototype.onScaleAmplitude = function(value) {
+    //Alter output scale
+    var scaleFactor = 2.5;
+    var streams = this.scene.getObjectByName('dataStreams');
+    if(streams) {
+        streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+    }
+};
+
+Oscilloscope.prototype.onScaleTime = function(value) {
+    //Adjust time scale
+    var scaleFactor = 2.5;
+    var streams = this.scene.getObjectByName('dataStreams');
+    if(streams) {
+        streams.scale.x = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
     }
 };
 
@@ -172,14 +206,21 @@ $(document).ready(function() {
     //app.createGUI();
 
     //GUI callbacks
-    $("#chan1").on("click", function(evt) {
-        app.displayChannel(1);
+    $(".button-control").on("click", function(evt) {
+        app.displayChannel(evt.currentTarget.id);
     });
-    $("#chan2").on("click", function(evt) {
-        app.displayChannel(2);
+
+    //GUI Controls
+    $('#ampScale').knob({
+        change : function(value) {
+            app.onScaleAmplitude(value);
+        }
     });
-    $("#chan3").on("click", function(evt) {
-        app.displayChannel(3);
+
+    $('#timeScale').knob({
+        change : function(value) {
+            app.onScaleTime(value);
+        }
     });
 
     $(document).keydown(function (event) {

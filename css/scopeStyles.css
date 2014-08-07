@@ -1,5 +1,8 @@
 /*Styles for oscilloscope vis app */
 
+body {
+    background-color: #a7a7a7;
+}
 #WebGL-output {
     /* set margin to 0 and overflow to hidden, to go fullscreen */
     margin: 0;
@@ -11,14 +14,24 @@ canvas {
 .button-xsmall {
     font-size: 70%;
 }
+.mainTitle {
+    font-size: 24px;
+    font-family: sans-serif;
+    text-align: center;
+}
 .header {
     text-align: center;
+    margin-top: 0px;
 }
 .footer {
     width: 100%;
 }
 .channels {
 
+}
+.buttonLabel {
+    text-align: center;
+    padding: 5px;
 }
 .title {
     width: 100%;
@@ -32,4 +45,13 @@ canvas {
 .infoCell {
     /*margin-top: 10px;*/
     margin-bottom: 10px;
+}
+.dialControl {
+    padding: 20px;
+    text-align: center;
+}
+.controlTitle {
+    width: 90%;
+    text-align: center;
+    padding: 10px;
 }
