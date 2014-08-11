@@ -16,12 +16,16 @@ Oscilloscope.prototype.init = function(container) {
     this.guiControls = null;
     this.dataFile = null;
     this.filename = '';
+    this.displayTime = 5;
+    this.currentTime = 10;
+    this.timeInc = 5;
+    this.allSelected = false;
 };
 
 Oscilloscope.prototype.update = function() {
     //Perform any updates
     var delta = this.clock.getDelta();
-    var clicked = this.mouse.clicked;
+    var clicked = this.mouse.down;
 
     //Perform mouse hover
     var vector = new THREE.Vector3(( this.mouse.x / window.innerWidth ) * 2 - 1, -( this.mouse.y / window.innerHeight ) * 2 + 1, 0.5);
@@ -30,7 +34,7 @@ Oscilloscope.prototype.update = function() {
     var raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
 
     this.hoverObjects.length = 0;
-    this.hoverObjects = raycaster.intersectObjects(this.scene.children, true);
+    //this.hoverObjects = raycaster.intersectObjects(this.scene.children, true);
 
     //Check hover actions
     if(this.hoverObjects.length != 0) {
@@ -39,6 +43,13 @@ Oscilloscope.prototype.update = function() {
         }
     }
 
+    if(clicked) {
+        var channel = $('#channelNum').val() -1;
+        var line = this.scene.getObjectByName('lineMesh'+channel, true);
+        if(line) {
+            line.position.y -= (this.mouse.endY - this.mouse.startY)/500;
+        }
+    }
     BaseApp.prototype.update.call(this);
 };
 
@@ -185,6 +196,45 @@ Oscilloscope.prototype.onScaleTime = function(value) {
     }
 };
 
+Oscilloscope.prototype.showPreviousTime = function(value) {
+    //Forward to next page of data
+    if(this.displayTime - this.timeInc < 0) return;
+
+    this.displayTime -= this.timeInc;
+    this.currentTime -= this.timeInc;
+    var streams = this.scene.getObjectByName('dataStreams');
+    if(streams) {
+        streams.position.x += this.timeInc;
+    }
+};
+
+Oscilloscope.prototype.showNextTime = function(value) {
+    //Go backward to previous page of data
+    if(this.displayTime + this.timeInc > this.currentTime) return;
+
+    this.displayTime += this.timeInc;
+    this.currentTime += this.timeInc;
+    var streams = this.scene.getObjectByName('dataStreams');
+    if(streams) {
+        streams.position.x -= this.timeInc;
+    }
+};
+
+Oscilloscope.prototype.toggleSelectAll = function() {
+    this.allSelected = !this.allSelected;
+    var line;
+    for(var i=0; i<this.dataStreams.length; ++i) {
+        line = this.scene.getObjectByName('lineMesh'+i, true);
+        if(line) {
+            line.visible = this.allSelected;
+            this.dataStreams[i].enabled = line.visible;
+            var channel = i+1;
+            var elem = 'chan'+channel+'Status';
+            $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
+        }
+    }
+};
+
 Oscilloscope.prototype.onKeyDown = function(event) {
     //Do any base app key handling
     BaseApp.prototype.keydown.call(this, event);
@@ -206,7 +256,7 @@ $(document).ready(function() {
     //app.createGUI();
 
     //GUI callbacks
-    $(".button-control").on("click", function(evt) {
+    $(".dataChannels").on("click", function(evt) {
         app.displayChannel(evt.currentTarget.id);
     });
 
@@ -221,6 +271,18 @@ $(document).ready(function() {
         change : function(value) {
             app.onScaleTime(value);
         }
+    });
+
+    $('#timeBack').on("click", function(evt) {
+        app.showPreviousTime();
+    });
+
+    $('#timeForward').on("click", function(evt) {
+        app.showNextTime();
+    });
+
+    $('#all').on("change", function(evt) {
+        app.toggleSelectAll();
     });
 
     $(document).keydown(function (event) {

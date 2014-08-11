@@ -13,7 +13,7 @@ function BaseApp() {
     this.projector = null;
     this.objectList = [];
     this.root = null;
-    this.mouse = { x:0, y:0, clicked:false};
+    this.mouse = { startX:0, startY:0, down:false, endX:0, endY:0};
     this.pickedObjects = [];
     this.hoverObjects = [];
     this.startTime = 0;
@@ -47,6 +47,9 @@ BaseApp.prototype.createRenderer = function() {
     this.container.addEventListener('mousedown', function(event) {
         _this.mouseClicked(event);
     }, false);
+    this.container.addEventListener('mouseup', function(event) {
+        _this.mouseClicked(event);
+    }, false);
     this.container.addEventListener('mousemove', function(event) {
         _this.mouseMoved(event);
     }, false);
@@ -71,9 +74,15 @@ BaseApp.prototype.keydown = function(event) {
 
 BaseApp.prototype.mouseClicked = function(event) {
     //Update mouse state
-    this.mouse.x = event.clientX;
-    this.mouse.y = event.clientY;
-    this.mouse.clicked = true;
+    if(event.type == 'mouseup') {
+        this.mouse.endX = event.clientX;
+        this.mouse.endY = event.clientY;
+        this.mouse.down = false;
+        return;
+    }
+    this.mouse.startX = event.clientX;
+    this.mouse.startY = event.clientY;
+    this.mouse.down = true;
 
     var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
     this.projector.unprojectVector(vector, this.camera);
@@ -86,9 +95,8 @@ BaseApp.prototype.mouseClicked = function(event) {
 
 BaseApp.prototype.mouseMoved = function(event) {
     //Update mouse state
-    this.mouse.x = event.clientX;
-    this.mouse.y = event.clientY;
-    this.mouse.clicked = false;
+    this.mouse.endX = event.clientX;
+    this.mouse.endY = event.clientY;
 };
 
 BaseApp.prototype.createScene = function() {
@@ -131,8 +139,7 @@ BaseApp.prototype.createControls = function() {
 
 BaseApp.prototype.update = function() {
     //Do any updates
-    this.controls.update();
-    this.mouse.clicked = false;
+    //this.controls.update();
 };
 
 BaseApp.prototype.run = function(timestamp) {

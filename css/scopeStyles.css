@@ -14,6 +14,22 @@ canvas {
 .button-xsmall {
     font-size: 70%;
 }
+.button-control {
+    width: 50px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+}
+#timeBack {
+    background-image: url("../images/backward.png");
+}
+#timePause {
+    background-image: url("../images/pause.png");
+}
+#timeForward {
+    background-image: url("../images/forward.png");
+}
 .mainTitle {
     font-size: 24px;
     font-family: sans-serif;
@@ -33,14 +49,18 @@ canvas {
     text-align: center;
     padding: 5px;
 }
-.title {
-    width: 100%;
-}
 .dataStatus {
     width: 12%;
     overflow: hidden;
     background-color: #ff0000;
     margin: 5px 35px;
+}
+.timeControls {
+    width: 50%;
+    text-align: center;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .infoCell {
     /*margin-top: 10px;*/
@@ -54,4 +74,12 @@ canvas {
     width: 90%;
     text-align: center;
     padding: 10px;
+}
+.channelSelect {
+    margin-top: 30px;
+    text-align: center;
+}
+.spinner {
+    width: 40px;
+    font-size: small;
 }
