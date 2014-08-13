@@ -6,10 +6,11 @@ body {
 #WebGL-output {
     /* set margin to 0 and overflow to hidden, to go fullscreen */
     margin: 0;
-    /*overflow: hidden;*/
+    overflow: hidden;
 }
 canvas {
     border-radius: 15px;
+    overflow: hidden;
 }
 .button-xsmall {
     font-size: 70%;
@@ -20,15 +21,20 @@ canvas {
     background-repeat: no-repeat;
     background-position: center;
     text-align: center;
+    background-color: rgba(110, 110, 110, 0.5);
 }
 #timeBack {
     background-image: url("../images/backward.png");
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
 }
 #timePause {
     background-image: url("../images/pause.png");
 }
 #timeForward {
     background-image: url("../images/forward.png");
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
 }
 .mainTitle {
     font-size: 24px;
@@ -79,7 +85,14 @@ canvas {
     margin-top: 30px;
     text-align: center;
 }
+#chan {
+    margin-top: 10px;
+}
 .spinner {
+    margin-bottom: 5px;
     width: 40px;
-    font-size: small;
+    height: 25px;
+    font-size: medium;
+    border: 1px solid gray;
+    border-radius: 5px;
 }

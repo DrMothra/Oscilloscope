@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <title>Oscilloscope</title>
 
-    <script type="text/javascript" src="js/three.js"></script>
+    <script type="text/javascript" src="js/three.js?v=68"></script>
     <script type="text/javascript" src="js/jquery-1.9.0.js"></script>
     <script type="text/javascript" src="js/TrackballControls.js"></script>
     <script type="text/javascript" src="js/dat.gui.js"></script>
     <script type="text/javascript" src="js/Blob.js"></script>
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
-    <script type="text/javascript" src="js/baseApp.js"></script>
+    <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
-    <script type="text/javascript" src="js/oscilloscope.js"></script>
+    <script type="text/javascript" src="js/oscilloscope.js?v=0.1"></script>
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-    <link href="css/scopeStyles.css?v=0.1" rel="stylesheet" type="text/css">
+    <link href="css/scopeStyles.css?v=0.2" rel="stylesheet" type="text/css">
 </head>
 <body>
 <!-- Stats output -->
@@ -202,11 +202,25 @@
                     </label>
                 </div>
                 <div class="pure-u-1-2 channelSelect">
-                    <label for="channelNum">Channel:</label>
-                    <input id="channelNum" type="number" value="1" min="1" max="14" class="spinner">
+                    <label for="separate" class="pure-checkbox">
+                        <input id="separate" type="checkbox"> Auto-separate
+                    </label>
                 </div>
             </div>
         </div>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-1-2">
+
+                </div>
+                <div id="chan" class="pure-u-1-2 channelSelect">
+                    <label for="channelNum">Channel:
+                        <input id="channelNum" type="number" value="1" min="1" max="14" class="spinner">
+                    </label>
+                </div>
+            </div>
+        </div>
+
     </div>
     <!-- Div which will hold the Output -->
     <div id="WebGL-output" class="pure-u-3-5">

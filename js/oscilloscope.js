@@ -2,6 +2,10 @@
  * Created by atg on 06/08/2014.
  */
 
+//Globals
+var MAXY = 35;
+var MINY = -40;
+
 //Init this app from base
 function Oscilloscope() {
     BaseApp.call(this);
@@ -20,6 +24,8 @@ Oscilloscope.prototype.init = function(container) {
     this.currentTime = 10;
     this.timeInc = 5;
     this.allSelected = false;
+    this.numVisChannels = 0;
+    this.autoSep = false;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -47,7 +53,9 @@ Oscilloscope.prototype.update = function() {
         var channel = $('#channelNum').val() -1;
         var line = this.scene.getObjectByName('lineMesh'+channel, true);
         if(line) {
-            line.position.y -= (this.mouse.endY - this.mouse.startY)/500;
+            if(line.visible) {
+                line.position.y -= (this.mouse.endY - this.mouse.startY)/500;
+            }
         }
     }
     BaseApp.prototype.update.call(this);
@@ -175,6 +183,8 @@ Oscilloscope.prototype.displayChannel = function(id) {
         ++channel;
         var elem = 'chan'+channel+'Status';
         $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
+        this.numVisChannels = line.visible ? this.numVisChannels+1 : this.numVisChannels-1;
+        if(this.autoSep) this.separateChannels();
     }
 };
 
@@ -223,14 +233,39 @@ Oscilloscope.prototype.showNextTime = function(value) {
 Oscilloscope.prototype.toggleSelectAll = function() {
     this.allSelected = !this.allSelected;
     var line;
+    var visChannels = 0;
     for(var i=0; i<this.dataStreams.length; ++i) {
         line = this.scene.getObjectByName('lineMesh'+i, true);
         if(line) {
             line.visible = this.allSelected;
+            if(line.visible) ++visChannels;
             this.dataStreams[i].enabled = line.visible;
             var channel = i+1;
             var elem = 'chan'+channel+'Status';
             $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
+        }
+    }
+    this.numVisChannels = line.visible ? visChannels : 0;
+};
+
+Oscilloscope.prototype.autoSeparate = function() {
+    this.autoSep = !this.autoSep;
+
+    if(this.autoSep) {
+        this.separateChannels();
+    }
+};
+
+Oscilloscope.prototype.separateChannels = function() {
+    //Work out separation distance
+    var yInc = (MAXY - MINY)/this.numVisChannels;
+    var visChannel = 0;
+    var startY = MINY;
+    for(var i=0; i<this.dataStreams.length; ++i) {
+        var name = 'lineMesh'+i;
+        var line = this.scene.getObjectByName(name, true);
+        if(line && line.visible) {
+            line.position.y = startY + (visChannel++ * yInc);
         }
     }
 };
@@ -283,6 +318,10 @@ $(document).ready(function() {
 
     $('#all').on("change", function(evt) {
         app.toggleSelectAll();
+    });
+
+    $('#separate').on("change", function(evt) {
+        app.autoSeparate();
     });
 
     $(document).keydown(function (event) {
