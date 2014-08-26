@@ -72,6 +72,15 @@ Oscilloscope.prototype.createScene = function() {
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
     this.scene.add(grid);
 
+    //Scale lines
+    var linesGeom = new THREE.PlaneGeometry(150, 2);
+    var tex = THREE.ImageUtils.loadTexture("images/lines.png");
+    var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
+    var lines = new THREE.Mesh(linesGeom, lineMaterial);
+    lines.position.z = 9;
+
+    this.scene.add(lines);
+
     this.generateData();
 };
 
@@ -270,6 +279,16 @@ Oscilloscope.prototype.separateChannels = function() {
     }
 };
 
+Oscilloscope.prototype.createChildWindow = function() {
+    //Create new browser window
+    //Quarter the size of main window
+    var childWidth = window.innerWidth/2;
+    var childHeight = window.innerHeight/2;
+
+    var props = 'height='+childHeight+' width='+childWidth+' location=0';
+    window.open("child.html", '_blank', props);
+};
+
 Oscilloscope.prototype.onKeyDown = function(event) {
     //Do any base app key handling
     BaseApp.prototype.keydown.call(this, event);
@@ -320,8 +339,8 @@ $(document).ready(function() {
         app.toggleSelectAll();
     });
 
-    $('#separate').on("change", function(evt) {
-        app.autoSeparate();
+    $('#newChild').on("click", function(evt) {
+        app.createChildWindow();
     });
 
     $(document).keydown(function (event) {
