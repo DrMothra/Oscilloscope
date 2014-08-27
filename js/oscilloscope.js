@@ -6,6 +6,78 @@
 var MAXY = 35;
 var MINY = -40;
 
+function createHorizontalGridLines() {
+    //Draw gridlines onto canvas and use as texture
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    //Background colour
+    context.fillStyle = "rgba(0, 0, 0, 0.0)";
+    //Line colour
+    context.strokeStyle = "rgba(0, 0, 0, 1.0)";
+    context.lineWidth = 5;
+    //Draw lines
+    var totalWidth = 300;
+    var xStart = 5.5;
+    var yStart = 85;
+    var divWidth = 20;
+    var divLength = 30;
+    context.beginPath();
+    context.moveTo(0, 100);
+    context.lineTo(totalWidth+0, 100);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.lineWidth = 1;
+    context.beginPath();
+    //Create divisions
+    for(var i=xStart; i<totalWidth; i+=divWidth) {
+        context.moveTo(i, yStart);
+        context.lineTo(i, yStart+divLength);
+    }
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    return canvas;
+}
+
+function createVerticalGridLines() {
+    //Draw gridlines onto canvas and use as texture
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    //Background colour
+    context.fillStyle = "rgba(0, 0, 0, 0.0)";
+    //Line colour
+    context.strokeStyle = "rgba(0, 0, 0, 1.0)";
+    context.lineWidth = 10;
+    //Draw lines
+    var totalHeight = 200;
+    var yStart = 5;
+    var xStart = 150;
+    var divSpacing = 20;
+    var divWidth = 80;
+    context.beginPath();
+    context.moveTo(xStart, yStart);
+    context.lineTo(xStart, yStart+totalHeight);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    //Create divisions
+    context.lineWidth = 1;
+    xStart -= (divWidth/2);
+    for(var i=yStart; i<totalHeight; i+=divSpacing) {
+        context.moveTo(xStart+0.5, i+0.5);
+        context.lineTo(xStart+divWidth+0.5, i+0.5);
+    }
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    return canvas;
+}
+
 //Init this app from base
 function Oscilloscope() {
     BaseApp.call(this);
@@ -70,16 +142,53 @@ Oscilloscope.prototype.createScene = function() {
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
+    grid.position.y = 0;
+    grid.position.z = -1;
     this.scene.add(grid);
 
     //Scale lines
-    var linesGeom = new THREE.PlaneGeometry(150, 2);
-    var tex = THREE.ImageUtils.loadTexture("images/lines.png");
-    var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
-    var lines = new THREE.Mesh(linesGeom, lineMaterial);
-    lines.position.z = 9;
+    var canvas = createHorizontalGridLines();
+    var tex = new THREE.Texture(canvas);
+    tex.needsUpdate = true;
 
-    this.scene.add(lines);
+    var linesGeom = new THREE.PlaneGeometry(55, 5);
+    //var texImage = THREE.ImageUtils.loadTexture("images/lines.png");
+    var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
+    //var lineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
+    var hLinesLeft = new THREE.Mesh(linesGeom, lineMaterial);
+    hLinesLeft.position.x = -55;
+    var hLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
+    var hLinesRight = new THREE.Mesh(linesGeom, lineMaterial);
+    hLinesRight.position.x = 55;
+
+    this.scene.add(hLinesLeft);
+    this.scene.add(hLinesMid);
+    this.scene.add(hLinesRight);
+
+    canvas = createVerticalGridLines();
+    tex = new THREE.Texture(canvas);
+    tex.needsUpdate = true;
+
+    linesGeom = new THREE.PlaneGeometry(5, 25);
+    //lineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
+    lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
+    var vLinesTop = new THREE.Mesh(linesGeom, lineMaterial);
+    vLinesTop.position.y = 25;
+    var vLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
+    vLinesMid.position.y = 0;
+    var vLinesBottom = new THREE.Mesh(linesGeom, lineMaterial);
+    vLinesBottom.position.y = -25;
+
+    this.scene.add(vLinesTop);
+    this.scene.add(vLinesMid);
+    this.scene.add(vLinesBottom);
+
+    /*
+    var boxgeom = new THREE.BoxGeometry(10,10,10);
+    var boxmat = new THREE.MeshLambertMaterial( {color : 0xff0000});
+    var box = new THREE.Mesh(boxgeom, boxmat);
+    this.scene.add(box);
+    */
 
     this.generateData();
 };
