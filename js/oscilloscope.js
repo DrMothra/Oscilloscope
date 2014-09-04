@@ -333,12 +333,18 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
     }
 };
 
-Oscilloscope.prototype.onScaleTime = function(value) {
+Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     //Adjust time scale
-    var scaleFactor = 2.5;
+    var inc = 0;
+    var scaleFactor = 0.01;
+    if(value > changeValue) inc = scaleFactor;
+    if(value < changeValue) inc = -scaleFactor;
+
     var streams = this.scene.getObjectByName('dataStreams');
     if(streams) {
-        streams.scale.x = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+        //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+        streams.scale.x += inc;
+        if(streams.scale.x <= 0) streams.scale.x = 0.01;
     }
 };
 
@@ -451,7 +457,7 @@ $(document).ready(function() {
 
     $('#timeScale').knob({
         change : function(value) {
-            app.onScaleTime(value);
+            app.onScaleTime(value, this.cv);
         }
     });
 
