@@ -17,9 +17,9 @@ function createHorizontalGridLines() {
     context.lineWidth = 5;
     //Draw lines
     var totalWidth = 300;
-    var xStart = 5.5;
+    var xStart = 0;
     var yStart = 85;
-    var divWidth = 20;
+    var divWidth = 25;
     var divLength = 30;
     context.beginPath();
     context.moveTo(0, 100);
@@ -98,6 +98,7 @@ Oscilloscope.prototype.init = function(container) {
     this.allSelected = false;
     this.numVisChannels = 0;
     this.autoSep = false;
+    this.lastAmp = 1;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -142,8 +143,8 @@ Oscilloscope.prototype.createScene = function() {
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
-    grid.position.y = 0;
-    grid.position.z = -1;
+    grid.position.y = -0.6;
+    grid.position.z = -0.1;
     this.scene.add(grid);
 
     //Scale lines
@@ -165,19 +166,30 @@ Oscilloscope.prototype.createScene = function() {
     this.scene.add(hLinesMid);
     this.scene.add(hLinesRight);
 
-    canvas = createVerticalGridLines();
-    tex = new THREE.Texture(canvas);
-    tex.needsUpdate = true;
+    //canvas = createVerticalGridLines();
+    //tex = new THREE.Texture(canvas);
+    //tex.needsUpdate = true;
 
-    linesGeom = new THREE.PlaneGeometry(5, 25);
-    //lineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
-    lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
+    var planeHeight = 36;
+    var yOffset = 8.25;
+    var xOffset = -0.9;
+    linesGeom = new THREE.PlaneGeometry(planeHeight, 5);
+    var redLineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
+    //lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
     var vLinesTop = new THREE.Mesh(linesGeom, lineMaterial);
-    vLinesTop.position.y = 25;
+    vLinesTop.position.x = xOffset;
+    vLinesTop.position.y = planeHeight + yOffset;
+    vLinesTop.rotation.z = Math.PI/2;
+
     var vLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
-    vLinesMid.position.y = 0;
+    vLinesMid.position.x = xOffset;
+    vLinesMid.position.y = yOffset;
+    vLinesMid.rotation.z = Math.PI/2;
+
     var vLinesBottom = new THREE.Mesh(linesGeom, lineMaterial);
-    vLinesBottom.position.y = -25;
+    vLinesBottom.position.x = xOffset;
+    vLinesBottom.position.y = -planeHeight + yOffset;
+    vLinesBottom.rotation.z = Math.PI/2;
 
     this.scene.add(vLinesTop);
     this.scene.add(vLinesMid);
@@ -306,12 +318,18 @@ Oscilloscope.prototype.displayChannel = function(id) {
     }
 };
 
-Oscilloscope.prototype.onScaleAmplitude = function(value) {
+Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
     //Alter output scale
-    var scaleFactor = 2.5;
+    var inc = 0;
+    var scaleFactor = 0.01;
+    if(value > changeValue) inc = scaleFactor;
+    if(value < changeValue) inc = -scaleFactor;
+
     var streams = this.scene.getObjectByName('dataStreams');
     if(streams) {
-        streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+        //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+        streams.scale.y += inc;
+        if(streams.scale.y <= 0) streams.scale.y = 0.01;
     }
 };
 
@@ -425,8 +443,9 @@ $(document).ready(function() {
 
     //GUI Controls
     $('#ampScale').knob({
+        stopper : false,
         change : function(value) {
-            app.onScaleAmplitude(value);
+            app.onScaleAmplitude(value, this.cv);
         }
     });
 
