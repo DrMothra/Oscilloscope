@@ -99,6 +99,9 @@ Oscilloscope.prototype.init = function(container) {
     this.numVisChannels = 0;
     this.autoSep = false;
     this.lastAmp = 1;
+    this.totalTime = 0;
+    this.periodMS = 31.25;
+    this.totalDelta = 0;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -131,6 +134,9 @@ Oscilloscope.prototype.update = function() {
             }
         }
     }
+
+    this.getData(delta);
+
     BaseApp.prototype.update.call(this);
 };
 
@@ -202,9 +208,50 @@ Oscilloscope.prototype.createScene = function() {
     this.scene.add(box);
     */
 
-    this.generateData();
+    //Set up data buffers
+    //Simulate a float being received at 32Hz
+    var sineData = [];
+    for(var t=0; t<Math.PI * 500; t+=Math.PI/32) {
+        var y = Math.sin(t);
+        sineData.push(y);
+    }
+    var scaleFactor = 10;
+    this.numPoints = 32;
+    var size = 320;
+    //this.geometry = new THREE.BufferGeometry();
+    this.geometry = new THREE.Geometry();
+    this.geometry.dynamic = true;
+    var material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
+    this.positions = new Float32Array(size * 3);
+
+    for (var i = 0; i < this.numPoints; i++) {
+        // positions
+        var dataPoint = sineData[i];
+        this.positions[ i * 3 ] = i;
+        this.positions[ i * 3 + 1 ] = dataPoint * scaleFactor;
+        this.positions[ i * 3 + 2 ] = 0;
+    }
+
+    //this.geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    //this.geometry.computeBoundingSphere();
+
+    for(var i=0; i < this.numPoints; i++) {
+        // positions
+        var dataPoint = sineData[i];
+        this.geometry.vertices.push(new THREE.Vector3(i, dataPoint * scaleFactor, 1));
+    }
+
+    this.lineMesh = new THREE.Line(this.geometry, material);
+    this.lineMesh.name = 'lineMesh0';
+    this.lineMesh.visible = false;
+    var dataGroup = new THREE.Object3D();
+    dataGroup.name = 'dataStreams';
+    dataGroup.add(this.lineMesh);
+    this.scene.add(dataGroup);
 };
 
+/*
 Oscilloscope.prototype.generateData = function() {
     //Generate 3 forms of data for now
     //Power data, sine wave and square wave
@@ -255,7 +302,7 @@ Oscilloscope.prototype.generateData = function() {
 
     var sineData = [];
     for(var t=0; t<Math.PI * 50; t+=Math.PI/16) {
-        var y = Math.sin(t) * scaleFactor/5;
+        var y = Math.sin(t);
         sineData.push(y);
     }
     data = { enabled : false, description : 'Sine', data : sineData };
@@ -269,7 +316,7 @@ Oscilloscope.prototype.generateData = function() {
     data = { enabled : false, description : 'Square', data : squareData };
     this.dataStreams.push(data);
 
-    var colours = [0xFF40B3, 0x00ff00, 0x4FABFF];
+    var colours = [0x00ff00, 0xFF40B3, 0x4FABFF];
 
     for(var stream=0; stream<this.dataStreams.length; ++stream) {
         var currentData = this.dataStreams[stream];
@@ -297,6 +344,19 @@ Oscilloscope.prototype.generateData = function() {
     }
     this.scene.add(dataGroup);
 };
+*/
+
+Oscilloscope.prototype.getData = function(delta) {
+    //Simulate getting live data
+    this.totalDelta += (delta *1000);
+    if(this.totalDelta >= this.periodMS) {
+        this.totalTime += Math.PI/32;
+        var data = Math.sin(this.totalTime);
+        this.geometry.vertices.push(new THREE.Vector3(++this.numPoints, data*10, 1));
+        this.lineMesh.geometry.verticesNeedUpdate = true;
+        this.totalDelta = 0;
+    }
+};
 
 Oscilloscope.prototype.displayChannel = function(id) {
     //Toggle display for given channel
@@ -308,7 +368,7 @@ Oscilloscope.prototype.displayChannel = function(id) {
     var line = this.scene.getObjectByName('lineMesh'+channel, true);
     if(line) {
         line.visible = !line.visible;
-        this.dataStreams[channel].enabled = line.visible;
+        //this.dataStreams[channel].enabled = line.visible;
         //Alter line status
         ++channel;
         var elem = 'chan'+channel+'Status';
