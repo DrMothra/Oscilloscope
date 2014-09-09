@@ -135,7 +135,7 @@ Oscilloscope.prototype.update = function() {
         }
     }
 
-    this.getData(delta);
+    //this.getData(delta);
 
     BaseApp.prototype.update.call(this);
 };
@@ -218,12 +218,13 @@ Oscilloscope.prototype.createScene = function() {
     var scaleFactor = 10;
     this.numPoints = 32;
     var size = 320;
-    //this.geometry = new THREE.BufferGeometry();
-    this.geometry = new THREE.Geometry();
+    this.geometry = new THREE.BufferGeometry();
+    //this.geometry = new THREE.Geometry();
     this.geometry.dynamic = true;
-    var material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
 
     this.positions = new Float32Array(size * 3);
+    this.lineColours = new Float32Array(size * 4);
 
     for (var i = 0; i < this.numPoints; i++) {
         // positions
@@ -231,16 +232,28 @@ Oscilloscope.prototype.createScene = function() {
         this.positions[ i * 3 ] = i;
         this.positions[ i * 3 + 1 ] = dataPoint * scaleFactor;
         this.positions[ i * 3 + 2 ] = 0;
+
+        this.lineColours[i * 3] = 0;
+        this.lineColours[i * 3 + 1] = 1.0;
+        this.lineColours[i * 3 + 2] = 0;
+        this.lineColours[i * 3 + 3] = 1.0;
     }
 
-    //this.geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    for(var i=this.numPoints; i<size; ++i) {
+
+    }
+
+    this.geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    this.geometry.addAttribute('color', new THREE.BufferAttribute(this.lineColours, 4));
     //this.geometry.computeBoundingSphere();
 
+    /*
     for(var i=0; i < this.numPoints; i++) {
         // positions
         var dataPoint = sineData[i];
         this.geometry.vertices.push(new THREE.Vector3(i, dataPoint * scaleFactor, 1));
     }
+    */
 
     this.lineMesh = new THREE.Line(this.geometry, material);
     this.lineMesh.name = 'lineMesh0';
