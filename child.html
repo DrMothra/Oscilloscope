@@ -3,8 +3,63 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Scope Child Window</title>
+
+    <script type="text/javascript" src="js/three.js?v=68"></script>
+    <script type="text/javascript" src="js/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="js/TrackballControls.js"></script>
+
+    <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
+    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/jquery.knob.js"></script>
+    <script type="text/javascript" src="js/oscilloscope.js?v=0.1"></script>
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+    <link href="css/scopeStyles.css?v=0.2" rel="stylesheet" type="text/css">
 </head>
 <body>
+<!-- Stats output -->
+<div id="Stats-output">
+</div>
+<div class="mainTitle">
+    <p>Oscilloscope - Child</p>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1-8">
 
+    </div>
+    <div id="WebGL-output" class="pure-u-5-8">
+
+    </div>
+    <div class="controls pure-u-1-4">
+        <div class="centred controlTitle">
+            Output Controls
+        </div>
+        <div class="centred dialControl">
+            <input id="ampScale" value="1" data-width="70%" data-height="70%" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
+                   data-cursor=true data-min="1">
+            <p class="header">Amplitude</p>
+        </div>
+        <div class="centred dialControl">
+            <input id="timeScale" value="1" data-width="100" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
+                   data-cursor=true data-min="1">
+            <p class="header">Time</p>
+        </div>
+    </div>
+</div>
+<div class="footer pure-g">
+    <div class="pure-u-1-5">
+
+    </div>
+    <div class="pure-u-3-5">
+        <div class="timeControls">
+            <button id="timeBack" class="button-xsmall pure-button button-control"></button>
+            <button id="timePause" class="button-xsmall pure-button button-control"></button>
+            <button id="timeForward" class="button-xsmall pure-button button-control"></button>
+        </div>
+    </div>
+    <div class="pure-u-1-5">
+
+    </div>
+</div>
 </body>
 </html>

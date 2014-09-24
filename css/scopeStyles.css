@@ -31,6 +31,9 @@ canvas {
     border-radius: 15px;
     overflow: hidden;
 }
+.centred {
+    text-align: center;
+}
 .button-xsmall {
     font-size: 70%;
 }
@@ -100,13 +103,14 @@ canvas {
     margin-bottom: 10px;
 }
 .dialControl {
-    padding: 20px;
-    text-align: center;
+    padding: 10px;
+}
+.controls {
+    overflow: hidden;
 }
 .controlTitle {
     width: 90%;
-    text-align: center;
-    padding: 10px;
+    padding: 5px;
 }
 .channelSelect {
     margin-top: 30px;
