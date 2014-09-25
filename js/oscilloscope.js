@@ -100,8 +100,12 @@ Oscilloscope.prototype.init = function(container) {
     this.autoSep = false;
     this.lastAmp = 1;
     this.totalTime = 0;
-    this.periodMS = 31.25;
+    this.periodMS = 20;
     this.totalDelta = 0;
+    this.indexPos = 0;
+    this.vertexPos = 0;
+    this.startTimeOffset = 60.0;
+    this.animationSpeed = 0.05;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -135,7 +139,8 @@ Oscilloscope.prototype.update = function() {
         }
     }
 
-    //this.getData(delta);
+    this.getData(delta);
+    this.dataGroup.position.x -= this.animationSpeed;
 
     BaseApp.prototype.update.call(this);
 };
@@ -149,7 +154,7 @@ Oscilloscope.prototype.createScene = function() {
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
-    grid.position.y = -0.6;
+    grid.position.y = 0.75;
     grid.position.z = -0.1;
     this.scene.add(grid);
 
@@ -158,23 +163,21 @@ Oscilloscope.prototype.createScene = function() {
     var tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
 
+    var yHorizOffset = 1.5;
     var linesGeom = new THREE.PlaneGeometry(55, 5);
-    //var texImage = THREE.ImageUtils.loadTexture("images/lines.png");
     var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
-    //var lineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
     var hLinesLeft = new THREE.Mesh(linesGeom, lineMaterial);
     hLinesLeft.position.x = -55;
+    hLinesLeft.position.y = yHorizOffset;
     var hLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
+    hLinesMid.position.y = yHorizOffset;
     var hLinesRight = new THREE.Mesh(linesGeom, lineMaterial);
     hLinesRight.position.x = 55;
+    hLinesRight.position.y = yHorizOffset;
 
     this.scene.add(hLinesLeft);
     this.scene.add(hLinesMid);
     this.scene.add(hLinesRight);
-
-    //canvas = createVerticalGridLines();
-    //tex = new THREE.Texture(canvas);
-    //tex.needsUpdate = true;
 
     var planeHeight = 36;
     var yOffset = 8.25;
@@ -201,67 +204,46 @@ Oscilloscope.prototype.createScene = function() {
     this.scene.add(vLinesMid);
     this.scene.add(vLinesBottom);
 
-    /*
-    var boxgeom = new THREE.BoxGeometry(10,10,10);
-    var boxmat = new THREE.MeshLambertMaterial( {color : 0xff0000});
-    var box = new THREE.Mesh(boxgeom, boxmat);
-    this.scene.add(box);
-    */
-
     //Set up data buffers
     //Simulate a float being received at 32Hz
-    var sineData = [];
-    for(var t=0; t<Math.PI * 500; t+=Math.PI/32) {
-        var y = Math.sin(t);
-        sineData.push(y);
+    var cycles = 1000;
+    var sampleRate = 32;
+    var numPoints = cycles * sampleRate;
+
+    this.vertices = [];
+    this.indices = [];
+    for(var t=0; t<Math.PI*cycles; t+=(Math.PI/sampleRate)) {
+        var y = 10 * Math.sin(t);
+        this.vertices.push(0, 0, 0);
     }
-    var scaleFactor = 10;
-    this.numPoints = 32;
-    var size = 320;
-    //this.geometry = new THREE.BufferGeometry();
-    this.geometry = new THREE.Geometry();
+    //Create geometry
+    //this.indices = new Uint16Array(numPoints);
+    this.indices = [];
+    for(var i=0; i<numPoints; ++i) {
+        this.indices.push(i);
+    }
+    //this.vertices =  new Float32Array( numPoints*3 );
+
+    this.geometry = new THREE.BufferGeometry();
     this.geometry.dynamic = true;
-    var material = new THREE.LineBasicMaterial({ color : 0x00ff00 });
-
-    this.positions = new Float32Array(size * 3);
-    //this.lineColours = new Float32Array(size * 3);
-
-    /*
-    for (var i = 0; i < this.numPoints; i++) {
-        // positions
-        var dataPoint = sineData[i];
-        this.positions[ i * 3 ] = i;
-        this.positions[ i * 3 + 1 ] = dataPoint * scaleFactor;
-        this.positions[ i * 3 + 2 ] = 0;
-    }
-
-    for(var i=this.numPoints; i<size; ++i) {
-
-    }
-
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
-    this.geometry.addAttribute('color', new THREE.BufferAttribute(this.lineColours, 3));
+    this.geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(this.indices), 1 ) );
+    this.geometry.addAttribute( 'position', new THREE.BufferAttribute(new Float32Array(this.vertices), 3 ) );
     this.geometry.computeBoundingSphere();
-    */
 
+    this.positions = this.geometry.attributes.position.array;
 
-    for(var i=0; i < this.numPoints; i++) {
-        // positions
-        var dataPoint = sineData[i];
-        this.geometry.vertices.push(new THREE.Vector3(i, dataPoint * scaleFactor, 1));
-    }
+    this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
+    var lineMat = new THREE.LineBasicMaterial( {color : 0x00ff00});
 
-    for(var i=0; i < 10; ++i) {
-        this.geometry.vertices.push(new THREE.Vector3(-1000, -1000, -1000));
-    }
-
-    this.lineMesh = new THREE.Line(this.geometry, material);
+    this.lineMesh = new THREE.Line(this.geometry, lineMat);
     this.lineMesh.name = 'lineMesh0';
-    this.lineMesh.visible = false;
+    this.lineMesh.visible = true;
     var dataGroup = new THREE.Object3D();
     dataGroup.name = 'dataStreams';
+    dataGroup.position.x = this.startTimeOffset;
     dataGroup.add(this.lineMesh);
     this.scene.add(dataGroup);
+    this.dataGroup = dataGroup;
 };
 
 /*
@@ -364,9 +346,13 @@ Oscilloscope.prototype.getData = function(delta) {
     this.totalDelta += (delta *1000);
     if(this.totalDelta >= this.periodMS) {
         this.totalTime += Math.PI/32;
-        var data = Math.sin(this.totalTime);
-        this.geometry.vertices.push(new THREE.Vector3(++this.numPoints, data*10, 1));
-        this.lineMesh.geometry.verticesNeedUpdate = true;
+        var y = 10 * Math.sin(this.totalTime);
+        this.positions[this.vertexPos++] = this.totalTime;
+        this.positions[this.vertexPos++] = y;
+        this.positions[this.vertexPos++] = 3;
+        this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0}];
+        //this.lineMesh.geometry.verticesNeedUpdate = true;
+        this.geometry.attributes.position.needsUpdate = true;
         this.totalDelta = 0;
     }
 };
