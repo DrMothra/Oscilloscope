@@ -53,6 +53,9 @@ BaseApp.prototype.createRenderer = function() {
     this.container.addEventListener('mousemove', function(event) {
         _this.mouseMoved(event);
     }, false);
+    window.addEventListener('resize', function(event) {
+        _this.windowResize(event);
+    }, false);
 };
 
 BaseApp.prototype.keydown = function(event) {
@@ -97,6 +100,15 @@ BaseApp.prototype.mouseMoved = function(event) {
     //Update mouse state
     this.mouse.endX = event.clientX;
     this.mouse.endY = event.clientY;
+};
+
+BaseApp.prototype.windowResize = function(event) {
+    //Handle window resize
+    this.camera.aspect = window.innerHeight / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize( this.container.clientWidth*0.97, window.innerHeight*0.8 );
+    //console.log('Size =', )
 };
 
 BaseApp.prototype.createScene = function() {

@@ -106,6 +106,7 @@ Oscilloscope.prototype.init = function(container) {
     this.vertexPos = 0;
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
+    this.channels = [];
 };
 
 Oscilloscope.prototype.update = function() {
@@ -237,7 +238,8 @@ Oscilloscope.prototype.createScene = function() {
 
     this.lineMesh = new THREE.Line(this.geometry, lineMat);
     this.lineMesh.name = 'lineMesh0';
-    this.lineMesh.visible = true;
+    this.lineMesh.visible = false;
+    this.lineMesh.frustumCulled = false;
     var dataGroup = new THREE.Object3D();
     dataGroup.name = 'dataStreams';
     dataGroup.position.x = this.startTimeOffset;
@@ -357,6 +359,25 @@ Oscilloscope.prototype.getData = function(delta) {
     }
 };
 
+Oscilloscope.prototype.updateChannels = function(channel, visibility) {
+    //Update selected channels
+    var foundChannel = false;
+    for(var i=0; i<this.channels.length; ++i) {
+        if(channel == this.channels[i]) {
+            foundChannel = true;
+            break;
+        }
+    }
+
+    if(visibility && !foundChannel) {
+        //Add channel to list
+        this.channels.push(channel);
+    } else if(!visibility && foundChannel) {
+        //Remove from list
+        this.channels.splice(i, 1);
+    }
+};
+
 Oscilloscope.prototype.displayChannel = function(id) {
     //Toggle display for given channel
     //Remove 'chan'
@@ -367,6 +388,9 @@ Oscilloscope.prototype.displayChannel = function(id) {
     var line = this.scene.getObjectByName('lineMesh'+channel, true);
     if(line) {
         line.visible = !line.visible;
+        this.updateChannels(channel, line.visible);
+        //DEBUG
+        //console.log('Channels =', this.channels);
         //this.dataStreams[channel].enabled = line.visible;
         //Alter line status
         ++channel;
@@ -474,11 +498,14 @@ Oscilloscope.prototype.separateChannels = function() {
 Oscilloscope.prototype.createChildWindow = function() {
     //Create new browser window
     //Quarter the size of main window
+    //Only create if data selected
+    if(this.numVisChannels == 0) return;
+
     var childWidth = window.innerWidth/2;
     var childHeight = window.innerHeight/2;
 
     var props = 'height='+childHeight+' width='+childWidth+' location=0';
-    window.open("child.html", '_blank', props);
+    window.open("child.html?channels="+this.channels[0], '_blank', props);
 };
 
 Oscilloscope.prototype.onKeyDown = function(event) {
