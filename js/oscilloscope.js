@@ -165,6 +165,8 @@ Oscilloscope.prototype.createScene = function() {
     this.scene.add(grid);
 
     //Scale lines
+    var scaleGroup = new THREE.Object3D();
+    scaleGroup.name = 'scaleGroup';
     var canvas = createHorizontalGridLines();
     var tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
@@ -181,9 +183,9 @@ Oscilloscope.prototype.createScene = function() {
     hLinesRight.position.x = 55;
     hLinesRight.position.y = yHorizOffset;
 
-    this.scene.add(hLinesLeft);
-    this.scene.add(hLinesMid);
-    this.scene.add(hLinesRight);
+    scaleGroup.add(hLinesLeft);
+    scaleGroup.add(hLinesMid);
+    scaleGroup.add(hLinesRight);
 
     var planeHeight = 36;
     var yOffset = 8.25;
@@ -206,9 +208,10 @@ Oscilloscope.prototype.createScene = function() {
     vLinesBottom.position.y = -planeHeight + yOffset;
     vLinesBottom.rotation.z = Math.PI/2;
 
-    this.scene.add(vLinesTop);
-    this.scene.add(vLinesMid);
-    this.scene.add(vLinesBottom);
+    scaleGroup.add(vLinesTop);
+    scaleGroup.add(vLinesMid);
+    scaleGroup.add(vLinesBottom);
+    this.scene.add(scaleGroup);
 
     //Set up data buffers
     //Simulate a float being received at 32Hz
@@ -537,11 +540,18 @@ Oscilloscope.prototype.toggleGrid = function() {
 
 Oscilloscope.prototype.toggleScale = function() {
     //Toggle scale display
-    var scale = this.scene.getObjectByName('scale', true);
+    var scale = this.scene.getObjectByName('scaleGroup', true);
     if(scale) {
         this.scaleVisible = !this.scaleVisible;
+        var _this = this;
+        scale.traverse(function(obj) {
+            if(obj instanceof THREE.Mesh) {
+                obj.visible = _this.scaleVisible;
+            }
+        });
     }
-}
+};
+
 $(document).ready(function() {
     //Initialise app
     var container = document.getElementById("WebGL-output");
