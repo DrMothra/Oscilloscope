@@ -107,6 +107,8 @@ Oscilloscope.prototype.init = function(container) {
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
     this.channels = [];
+    this.gridVisible = true;
+    this.scaleVisible = true;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -115,6 +117,7 @@ Oscilloscope.prototype.update = function() {
     var clicked = this.mouse.down;
 
     //Perform mouse hover
+    /*
     var vector = new THREE.Vector3(( this.mouse.x / window.innerWidth ) * 2 - 1, -( this.mouse.y / window.innerHeight ) * 2 + 1, 0.5);
     this.projector.unprojectVector(vector, this.camera);
 
@@ -139,6 +142,7 @@ Oscilloscope.prototype.update = function() {
             }
         }
     }
+    */
 
     this.getData(delta);
     this.dataGroup.position.x -= this.animationSpeed;
@@ -155,6 +159,7 @@ Oscilloscope.prototype.createScene = function() {
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
+    grid.name = 'grid';
     grid.position.y = 0.75;
     grid.position.z = -0.1;
     this.scene.add(grid);
@@ -246,6 +251,7 @@ Oscilloscope.prototype.createScene = function() {
     dataGroup.add(this.lineMesh);
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
+
 };
 
 /*
@@ -520,6 +526,22 @@ Oscilloscope.prototype.onKeyDown = function(event) {
     }
 };
 
+Oscilloscope.prototype.toggleGrid = function() {
+    //Toggle grid display
+    var grid = this.scene.getObjectByName('grid', true);
+    if(grid) {
+        this.gridVisible = !this.gridVisible;
+        grid.visible = this.gridVisible;
+    }
+};
+
+Oscilloscope.prototype.toggleScale = function() {
+    //Toggle scale display
+    var scale = this.scene.getObjectByName('scale', true);
+    if(scale) {
+        this.scaleVisible = !this.scaleVisible;
+    }
+}
 $(document).ready(function() {
     //Initialise app
     var container = document.getElementById("WebGL-output");
@@ -557,6 +579,14 @@ $(document).ready(function() {
 
     $('#all').on("change", function(evt) {
         app.toggleSelectAll();
+    });
+
+    $('#grid').on('click', function() {
+        app.toggleGrid();
+    });
+
+    $('#scale').on('click', function() {
+        app.toggleScale();
     });
 
     $('#newChild').on("click", function(evt) {
