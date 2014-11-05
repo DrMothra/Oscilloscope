@@ -89,13 +89,14 @@ canvas {
 
 }
 .streamLabel {
-    margin: 0 2%;
+    margin: 0 10%;
 }
 .dataStatus {
-    width: 12%;
+    width: 70%;
+    height: 1em;
+    margin-top: 5%;
     overflow: hidden;
     background-color: #ff0000;
-    margin: 5px 35px;
 }
 .streamInfo {
     letter-spacing: normal;

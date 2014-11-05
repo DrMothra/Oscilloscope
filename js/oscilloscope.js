@@ -121,6 +121,7 @@ Oscilloscope.prototype.init = function(container) {
 Oscilloscope.prototype.update = function() {
     //Perform any updates
     var delta = this.clock.getDelta();
+    this.totalTime += delta;
     var clicked = this.mouse.down;
 
     //Perform mouse hover
@@ -151,7 +152,13 @@ Oscilloscope.prototype.update = function() {
     }
     */
 
-    this.getData(delta);
+    //Update enabled channels
+    for(var i=0; i<this.channels.length; ++i) {
+        if(this.channels[i].enabled) {
+            this.updateChannel(i);
+        }
+    }
+
     this.dataGroup.position.x -= this.animationSpeed;
 
     BaseApp.prototype.update.call(this);
@@ -222,24 +229,17 @@ Oscilloscope.prototype.createScene = function() {
 
     //Set up data buffers
     //Simulate a float being received at 32Hz
-    var cycles = 1000;
+    //For 15 minutes
     var sampleRate = 32;
-    var numPoints = cycles * sampleRate;
+    var numPoints = 60 * sampleRate * 15;
 
     this.vertices = [];
     this.indices = [];
-    for(var t=0; t<Math.PI*cycles; t+=(Math.PI/sampleRate)) {
-        var y = 10 * Math.sin(t);
+    for(var t=0; t<numPoints; ++t) {
         this.vertices.push(0, 0, 0);
+        this.indices.push(t);
     }
     //Create geometry
-    //this.indices = new Uint16Array(numPoints);
-    this.indices = [];
-    for(var i=0; i<numPoints; ++i) {
-        this.indices.push(i);
-    }
-    //this.vertices =  new Float32Array( numPoints*3 );
-
     this.geometry = new THREE.BufferGeometry();
     this.geometry.dynamic = true;
     this.geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(this.indices), 1 ) );
@@ -253,11 +253,11 @@ Oscilloscope.prototype.createScene = function() {
 
     this.lineMesh = new THREE.Line(this.geometry, lineMat);
     this.lineMesh.name = 'lineMesh0';
-    this.lineMesh.visible = false;
+    this.lineMesh.visible = true;
     this.lineMesh.frustumCulled = false;
     var dataGroup = new THREE.Object3D();
     dataGroup.name = 'dataStreams';
-    dataGroup.position.x = this.startTimeOffset;
+    dataGroup.position.x = 0;
     dataGroup.add(this.lineMesh);
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
@@ -365,7 +365,7 @@ Oscilloscope.prototype.getData = function(delta) {
     if(this.totalDelta >= this.periodMS) {
         this.totalTime += Math.PI/32;
         var y = 10 * Math.sin(this.totalTime);
-        this.positions[this.vertexPos++] = this.totalTime;
+        this.positions[this.vertexPos++] = 0;//this.totalTime;
         this.positions[this.vertexPos++] = y;
         this.positions[this.vertexPos++] = 3;
         this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0}];
@@ -383,22 +383,15 @@ Oscilloscope.prototype.subscribe = function() {
         300);
 };
 
-Oscilloscope.prototype.updateChannels = function(channel, visibility) {
-    //Update selected channels
-    var foundChannel = false;
-    for(var i=0; i<this.channels.length; ++i) {
-        if(channel == this.channels[i]) {
-            foundChannel = true;
-            break;
-        }
-    }
-
-    if(visibility && !foundChannel) {
-        //Add channel to list
-        this.channels.push(channel);
-    } else if(!visibility && foundChannel) {
-        //Remove from list
-        this.channels.splice(i, 1);
+Oscilloscope.prototype.updateChannel = function(chanNumber) {
+    //Update channel
+    var data = this.channel.getLastValue(this.channels[chanNumber].name);
+    if(data != undefined) {
+        this.positions[this.vertexPos++] = this.totalTime;
+        this.positions[this.vertexPos++] = data;
+        this.positions[this.vertexPos++] = 3;
+        this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0}];
+        this.geometry.attributes.position.needsUpdate = true;
     }
 };
 
@@ -422,13 +415,12 @@ Oscilloscope.prototype.displayChannel = function(id) {
     if(chan < 0 || chan >= this.channels.length) return;
 
     this.channels[chan].name = channelName;
-    var enabled = this.channels[chan].enabled;
     this.channels[chan].enabled = !this.channels[chan].enabled;
 
     //Update status
-    ++chan;
-    var elem = 'stream'+chan+'Status';
-    $('#'+elem).css('background-color', enabled ? '#00ff00' : '#ff0000');
+    chanId = chan+1;
+    var elem = 'stream'+chanId+'Status';
+    $('#'+elem).css('background-color', this.channels[chan].enabled ? '#00ff00' : '#ff0000');
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
@@ -458,6 +450,19 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
         //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
         streams.scale.x += inc;
         if(streams.scale.x <= 0) streams.scale.x = 0.01;
+    }
+};
+
+Oscilloscope.prototype.onYShift = function(value, changeValue) {
+    //Adjust y position of values
+    var inc = 0;
+    var scaleFactor = 0.1;
+    if(value > changeValue) inc = scaleFactor;
+    if(value < changeValue) inc = -scaleFactor;
+
+    var dataGroup = this.scene.getObjectByName('dataStreams', true);
+    if(dataGroup) {
+        dataGroup.position.y += inc;
     }
 };
 
@@ -575,6 +580,10 @@ Oscilloscope.prototype.toggleScale = function() {
     }
 };
 
+Oscilloscope.prototype.validateChannel = function() {
+    console.log('Validate channel');
+};
+
 $(document).ready(function() {
     //Initialise app
     var container = document.getElementById("WebGL-output");
@@ -602,6 +611,12 @@ $(document).ready(function() {
         }
     });
 
+    $('#yShift').knob({
+        change : function(value) {
+            app.onYShift(value, this.cv);
+        }
+    });
+
     $('#timeBack').on("click", function(evt) {
         app.showPreviousTime();
     });
@@ -624,6 +639,12 @@ $(document).ready(function() {
 
     $('#newChild').on("click", function(evt) {
         app.createChildWindow();
+    });
+
+    $('#channelName').on("keydown", function(evt) {
+        if(evt.which == 13) {
+            app.validateChannel();
+        }
     });
 
     /*
