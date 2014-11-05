@@ -107,8 +107,15 @@ Oscilloscope.prototype.init = function(container) {
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
     this.channels = [];
+    for(var i=0; i<10; ++i) {
+        this.channels.push( { name: '', enabled: false} );
+    }
     this.gridVisible = true;
     this.scaleVisible = true;
+
+    //Pubnub data
+    this.subscribed = false;
+    this.channelName = null;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -368,6 +375,14 @@ Oscilloscope.prototype.getData = function(delta) {
     }
 };
 
+Oscilloscope.prototype.subscribe = function() {
+    //Subscribe to pubnub channel
+    this.channel = PubNubBuffer.subscribe(this.channelName,
+        "sub-c-2eafcf66-c636-11e3-8dcd-02ee2ddab7fe",
+        1000,
+        300);
+};
+
 Oscilloscope.prototype.updateChannels = function(channel, visibility) {
     //Update selected channels
     var foundChannel = false;
@@ -389,25 +404,31 @@ Oscilloscope.prototype.updateChannels = function(channel, visibility) {
 
 Oscilloscope.prototype.displayChannel = function(id) {
     //Toggle display for given channel
-    //Remove 'chan'
-    var channel = parseInt(id.substr(4, id.length-4));
-    --channel;
-    if(channel < 0) return;
-
-    var line = this.scene.getObjectByName('lineMesh'+channel, true);
-    if(line) {
-        line.visible = !line.visible;
-        this.updateChannels(channel, line.visible);
-        //DEBUG
-        //console.log('Channels =', this.channels);
-        //this.dataStreams[channel].enabled = line.visible;
-        //Alter line status
-        ++channel;
-        var elem = 'chan'+channel+'Status';
-        $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
-        this.numVisChannels = line.visible ? this.numVisChannels+1 : this.numVisChannels-1;
-        if(this.autoSep) this.separateChannels();
+    //See if currently subscribing
+    if(!this.subscribed) {
+        //Get channel to subscribe to
+        this.channelName = $('#channelName').val();
+        if(this.channelName != null) {
+            this.subscribe();
+            this.subscribed = true;
+        }
     }
+    var channelName = $('#'+id+'Name').val();
+    //Get channel id
+    var chanId = id.substr(6, 2);
+    var chan = parseInt(chanId);
+    if(!isNaN(chan)) --chan;
+
+    if(chan < 0 || chan >= this.channels.length) return;
+
+    this.channels[chan].name = channelName;
+    var enabled = this.channels[chan].enabled;
+    this.channels[chan].enabled = !this.channels[chan].enabled;
+
+    //Update status
+    ++chan;
+    var elem = 'stream'+chan+'Status';
+    $('#'+elem).css('background-color', enabled ? '#00ff00' : '#ff0000');
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
@@ -517,6 +538,7 @@ Oscilloscope.prototype.createChildWindow = function() {
     window.open("child.html?channels="+this.channels[0], '_blank', props);
 };
 
+/*
 Oscilloscope.prototype.onKeyDown = function(event) {
     //Do any base app key handling
     BaseApp.prototype.keydown.call(this, event);
@@ -528,6 +550,7 @@ Oscilloscope.prototype.onKeyDown = function(event) {
             break;
     }
 };
+*/
 
 Oscilloscope.prototype.toggleGrid = function() {
     //Toggle grid display
@@ -603,9 +626,11 @@ $(document).ready(function() {
         app.createChildWindow();
     });
 
+    /*
     $(document).keydown(function (event) {
         app.onKeyDown(event);
     });
+    */
 
     app.run();
 });

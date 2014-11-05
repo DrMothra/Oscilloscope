@@ -14,6 +14,8 @@
     <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
+    <script type="text/javascript" src="js/pubnub.min.js"></script>
+    <script type="text/javascript" src="js/pubnub_buffer.js"></script>
     <script type="text/javascript" src="js/oscilloscope.js?v=0.1"></script>
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
@@ -26,17 +28,22 @@
 <div class="mainTitle">
     <p>Oscilloscope</p>
 </div>
-<div class="layout pure-g control">
+<div class="pure-g">
     <!-- Channel selection -->
     <div class="channels pure-u-1-5">
-        <p class="channelHeader">Data Channels</p>
+        <p class="channelHeader">Data</p>
+        <div id="channelSelect">
+            <span id="channelText">Channel Name</span>
+            <input type="text" id="channelName" maxlength="20" size="15">
+        </div>
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-2 header">
-                    <span class="buttonLabel">Ch. 01</span>
-                    <button id="chan1" class="button-xsmall pure-button dataChannels">Enable</button>
+                <div class="streamInfo">
+                    <span class="streamLabel">Stream</span>
+                    <input type="text" id="stream1Name" size="10">
+                    <button id="stream1" class="button-xsmall pure-button dataChannels">Enable</button>
                 </div>
-                <div id="chan1Status" class="pure-u-1-2 dataStatus">
+                <div id="stream1Status" class="dataStatus">
 
                 </div>
             </div>

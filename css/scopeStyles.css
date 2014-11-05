@@ -36,6 +36,7 @@ canvas {
 }
 .button-xsmall {
     font-size: 70%;
+    vertical-align: middle;
 }
 .button-control {
     width: 50px;
@@ -44,6 +45,12 @@ canvas {
     background-position: center;
     text-align: center;
     background-color: rgba(110, 110, 110, 0.5);
+}
+#channelName {
+
+}
+#channelText {
+    margin: 1% 3%;
 }
 .centreText {
     text-align: center;
@@ -81,15 +88,17 @@ canvas {
 .channels {
 
 }
-.buttonLabel {
-    text-align: center;
-    padding: 5px;
+.streamLabel {
+    margin: 0 2%;
 }
 .dataStatus {
     width: 12%;
     overflow: hidden;
     background-color: #ff0000;
     margin: 5px 35px;
+}
+.streamInfo {
+    letter-spacing: normal;
 }
 .timeControls {
     width: 50%;
@@ -104,9 +113,6 @@ canvas {
 }
 .dialControl {
     padding: 10px;
-}
-.controls {
-    overflow: hidden;
 }
 .controlTitle {
     width: 90%;
