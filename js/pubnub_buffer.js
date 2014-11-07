@@ -101,7 +101,11 @@
         }
 
         return undefined;
-    }
+    };
+
+    Channel.prototype.getChannelNames = function() {
+        return this.channelnames;
+    };
 
 
     PubNubBuffer.subscribe = function(channel, subscribe_key, latency, size){

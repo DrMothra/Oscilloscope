@@ -126,7 +126,7 @@ BaseApp.prototype.createScene = function() {
 BaseApp.prototype.createCamera = function() {
 
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this.camera.position.set( 0, 0, 100 );
+    this.camera.position.set( 0, 0, 250 );
 
     console.log('dom =', this.renderer.domElement);
 };
@@ -151,7 +151,7 @@ BaseApp.prototype.createControls = function() {
 
 BaseApp.prototype.update = function() {
     //Do any updates
-    //this.controls.update();
+    this.controls.update();
 };
 
 BaseApp.prototype.run = function(timestamp) {

@@ -104,6 +104,7 @@ Oscilloscope.prototype.init = function(container) {
     this.totalDelta = 0;
     this.indexPos = 0;
     this.vertexPos = 0;
+    this.playHead = 60;
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
     this.channels = [];
@@ -113,6 +114,7 @@ Oscilloscope.prototype.init = function(container) {
     this.gridVisible = true;
     this.scaleVisible = true;
 
+    this.timeScale = 2;
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
@@ -120,8 +122,7 @@ Oscilloscope.prototype.init = function(container) {
 
 Oscilloscope.prototype.update = function() {
     //Perform any updates
-    var delta = this.clock.getDelta();
-    this.totalTime += delta;
+
     var clicked = this.mouse.down;
 
     //Perform mouse hover
@@ -159,8 +160,6 @@ Oscilloscope.prototype.update = function() {
         }
     }
 
-    this.dataGroup.position.x -= this.animationSpeed;
-
     BaseApp.prototype.update.call(this);
 };
 
@@ -169,12 +168,14 @@ Oscilloscope.prototype.createScene = function() {
     BaseApp.prototype.createScene.call(this);
 
     //Load background grid
-    var gridGeom = new THREE.PlaneGeometry(150, 100);
+    var width = 420;
+    var height = (2*width)/3;
+    var gridGeom = new THREE.PlaneGeometry(width, height);
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
     grid.name = 'grid';
-    grid.position.y = 0.75;
+    grid.position.y = 0;
     grid.position.z = -0.1;
     this.scene.add(grid);
 
@@ -185,24 +186,28 @@ Oscilloscope.prototype.createScene = function() {
     var tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
 
-    var yHorizOffset = 1.5;
-    var linesGeom = new THREE.PlaneGeometry(55, 5);
+    var yHorizOffset = 0.75;
+    var horizGridScale = 1;
+    var linesGeom = new THREE.PlaneGeometry(125, 5);
     var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
     var hLinesLeft = new THREE.Mesh(linesGeom, lineMaterial);
-    hLinesLeft.position.x = -55;
+    hLinesLeft.scale.x = horizGridScale;
+    hLinesLeft.position.x = -125;
     hLinesLeft.position.y = yHorizOffset;
     var hLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
+    hLinesMid.scale.x = horizGridScale;
     hLinesMid.position.y = yHorizOffset;
     var hLinesRight = new THREE.Mesh(linesGeom, lineMaterial);
-    hLinesRight.position.x = 55;
+    hLinesRight.scale.x = horizGridScale;
+    hLinesRight.position.x = 125;
     hLinesRight.position.y = yHorizOffset;
 
     scaleGroup.add(hLinesLeft);
     scaleGroup.add(hLinesMid);
     scaleGroup.add(hLinesRight);
 
-    var planeHeight = 36;
-    var yOffset = 8.25;
+    var planeHeight = 70;
+    var yOffset = 0;
     var xOffset = -0.9;
     linesGeom = new THREE.PlaneGeometry(planeHeight, 5);
     var redLineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
@@ -256,12 +261,21 @@ Oscilloscope.prototype.createScene = function() {
     this.lineMesh.visible = true;
     this.lineMesh.frustumCulled = false;
     var dataGroup = new THREE.Object3D();
+    dataGroup.scale.y = 1;
     dataGroup.name = 'dataStreams';
-    dataGroup.position.x = 0;
+    //dataGroup.position.y;
     dataGroup.add(this.lineMesh);
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
 
+    //Test
+    /*
+    var boxGeom = new THREE.BoxGeometry(2, 2, 2);
+    var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
+    var box = new THREE.Mesh(boxGeom, boxMat);
+    box.position.y = 102.5;
+    this.scene.add(box);
+    */
 };
 
 /*
@@ -387,10 +401,14 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
-        this.positions[this.vertexPos++] = this.totalTime;
+        //Adjust play head
+        var delta = this.clock.getDelta() * this.timeScale;
+        this.dataGroup.position.x -= delta;
+        this.playHead += delta;
+        this.positions[this.vertexPos++] = this.playHead;
         this.positions[this.vertexPos++] = data;
         this.positions[this.vertexPos++] = 3;
-        this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0}];
+        this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0} ];
         this.geometry.attributes.position.needsUpdate = true;
     }
 };
@@ -581,7 +599,25 @@ Oscilloscope.prototype.toggleScale = function() {
 };
 
 Oscilloscope.prototype.validateChannel = function() {
-    console.log('Validate channel');
+    //Subscribe to pubnub channel
+    var channel = $('#channelName').val();
+    this.channel = PubNubBuffer.subscribe(channel,
+        "sub-c-2eafcf66-c636-11e3-8dcd-02ee2ddab7fe",
+        1000,
+        300);
+
+    var value = null;
+
+    //Populate stream data
+    if(this.channel != null) {
+        this.channelName = channel;
+        var channels = this.channel.getChannelNames();
+        if(channels != null) {
+            for(var i=0; i<channels.length; ++i) {
+                console.log('Channel =', channels[i]);
+            }
+        }
+    }
 };
 
 $(document).ready(function() {
@@ -641,11 +677,13 @@ $(document).ready(function() {
         app.createChildWindow();
     });
 
+    /*
     $('#channelName').on("keydown", function(evt) {
         if(evt.which == 13) {
             app.validateChannel();
         }
     });
+    */
 
     /*
     $(document).keydown(function (event) {

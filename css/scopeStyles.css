@@ -89,12 +89,13 @@ canvas {
 
 }
 .streamLabel {
-    margin: 0 10%;
+    padding-left: 15%;
+    padding-right: 15%;
 }
 .dataStatus {
     width: 70%;
+    margin: 6% auto 2% auto;
     height: 1em;
-    margin-top: 5%;
     overflow: hidden;
     background-color: #ff0000;
 }
