@@ -104,7 +104,7 @@ Oscilloscope.prototype.init = function(container) {
     this.totalDelta = 0;
     this.indexPos = 0;
     this.vertexPos = 0;
-    this.playHead = 60;
+    this.playHead = 150;
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
     this.channels = [];
@@ -263,7 +263,6 @@ Oscilloscope.prototype.createScene = function() {
     var dataGroup = new THREE.Object3D();
     dataGroup.scale.y = 1;
     dataGroup.name = 'dataStreams';
-    //dataGroup.position.y;
     dataGroup.add(this.lineMesh);
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
@@ -273,7 +272,7 @@ Oscilloscope.prototype.createScene = function() {
     var boxGeom = new THREE.BoxGeometry(2, 2, 2);
     var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
     var box = new THREE.Mesh(boxGeom, boxMat);
-    box.position.y = 102.5;
+    box.position.y = 100;
     this.scene.add(box);
     */
 };
@@ -465,9 +464,10 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
 
     var streams = this.scene.getObjectByName('dataStreams');
     if(streams) {
-        //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
+        var offset = streams.position.x;
         streams.scale.x += inc;
         if(streams.scale.x <= 0) streams.scale.x = 0.01;
+        streams.position.x = offset*streams.scale.x;
     }
 };
 

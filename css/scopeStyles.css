@@ -72,32 +72,36 @@ canvas {
     font-size: 1.5em;
     font-family: sans-serif;
     text-align: center;
-    margin: 15px 0px;
+    margin: 15px 0;
 }
 .header {
-    text-align: center;
-    margin-top: 0px;
+    margin-top: 0;
+}
+.headerContainer {
+    margin-bottom: 10%;
 }
 .channelHeader {
     text-align: center;
-    margin: 10px 0px;
+    margin: 10px 0;
 }
 .footer {
     width: 100%;
 }
 .channels {
-
+    margin-top: 1%;
 }
-.streamLabel {
-    padding-left: 15%;
-    padding-right: 15%;
+#streamLabel {
+    margin-top: 3%;
 }
 .dataStatus {
-    width: 70%;
+    width: 50%;
     margin: 6% auto 2% auto;
     height: 1em;
     overflow: hidden;
     background-color: #ff0000;
+}
+#controlContainer {
+    margin-top: 1%;
 }
 .streamInfo {
     letter-spacing: normal;
@@ -114,7 +118,7 @@ canvas {
     margin-bottom: 10px;
 }
 .dialControl {
-    padding: 10px;
+    padding: 0;
 }
 .controlTitle {
     width: 90%;
