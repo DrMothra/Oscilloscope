@@ -114,7 +114,8 @@ Oscilloscope.prototype.init = function(container) {
     this.gridVisible = true;
     this.scaleVisible = true;
 
-    this.timeScale = 2;
+    this.deltaScale = 2;
+    this.timeScale = 1;
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
@@ -268,13 +269,17 @@ Oscilloscope.prototype.createScene = function() {
     this.dataGroup = dataGroup;
 
     //Test
-    /*
+
     var boxGeom = new THREE.BoxGeometry(2, 2, 2);
     var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
     var box = new THREE.Mesh(boxGeom, boxMat);
-    box.position.y = 100;
-    this.scene.add(box);
-    */
+    box.position.x = 50;
+    var boxGroup = new THREE.Object3D();
+    boxGroup.add(box);
+    boxGroup.scale.x = 2;
+    boxGroup.position.x = -50;
+    this.scene.add(boxGroup);
+
 };
 
 /*
@@ -401,10 +406,14 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
         //Adjust play head
-        var delta = this.clock.getDelta() * this.timeScale;
-        this.dataGroup.position.x -= delta;
+        var delta = this.clock.getDelta() * this.deltaScale;
+        this.totalTime += delta;
+        //this.dataGroup.position.x -= delta;
         this.playHead += delta;
-        this.positions[this.vertexPos++] = this.playHead;
+
+        this.dataGroup.scale.x = this.timeScale;
+
+        this.positions[this.vertexPos++] = this.totalTime;
         this.positions[this.vertexPos++] = data;
         this.positions[this.vertexPos++] = 3;
         this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0} ];
@@ -462,13 +471,7 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     if(value > changeValue) inc = scaleFactor;
     if(value < changeValue) inc = -scaleFactor;
 
-    var streams = this.scene.getObjectByName('dataStreams');
-    if(streams) {
-        var offset = streams.position.x;
-        streams.scale.x += inc;
-        if(streams.scale.x <= 0) streams.scale.x = 0.01;
-        streams.position.x = offset*streams.scale.x;
-    }
+    this.timeScale += inc;
 };
 
 Oscilloscope.prototype.onYShift = function(value, changeValue) {
