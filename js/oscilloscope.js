@@ -119,6 +119,8 @@ Oscilloscope.prototype.init = function(container) {
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
+
+    this.startPosition = 150;
 };
 
 Oscilloscope.prototype.update = function() {
@@ -269,13 +271,16 @@ Oscilloscope.prototype.createScene = function() {
     this.dataGroup = dataGroup;
 
     //Test
-
-    var boxGeom = new THREE.BoxGeometry(1, 1, 1);
+    /*
+    var boxGeom = new THREE.BoxGeometry(2, 2, 2);
     var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
     var box = new THREE.Mesh(boxGeom, boxMat);
-    var head = 0;
-    var delta = 11;
-    var scale = 2;
+    var box2 = new THREE.Mesh(boxGeom, boxMat);
+    box2.position.x = 150;
+    box2.position.y = 5;
+    var head = 150;
+    var delta = 20;
+    var scale = 1;
 
 
     var boxGroup = new THREE.Object3D();
@@ -283,13 +288,15 @@ Oscilloscope.prototype.createScene = function() {
 
     //head += delta;
     boxGroup.scale.x = scale;
-    box.position.x += delta;
-    boxGroup.position.x -= delta;
+    var dist = ((head + delta) * scale) - delta;
+    var offset = (dist - head)/scale;
+    box.position.x = head + delta - offset;
+    boxGroup.position.x = -delta;
 
-    var dist = (head - boxGroup.position.x) * scale;
-    dist +=  boxGroup.position.x;
-    boxGroup.position.x -= dist;
-    //this.scene.add(boxGroup);
+
+    this.scene.add(boxGroup);
+    this.scene.add(box2);
+    */
 };
 
 /*
@@ -419,19 +426,15 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         this.dataGroup.scale.x = this.timeScale;
         var delta = this.clock.getDelta();
         this.totalDelta -= delta;
-        //delta *= this.timeScale;
-
-        //this.dataGroup.position.x = -this.totalDelta;
-        //this.playHead = this.totalDelta;
-
 
         //Adjust play head
-        //var dist = (0 - this.dataGroup.position.x) * this.timeScale;
-        //dist += this.dataGroup.position.x;
         var dist = (-this.totalDelta) * this.timeScale;
         dist += this.totalDelta;
         this.dataGroup.position.x = this.totalDelta - dist;
-        this.playHead = -this.totalDelta + 150 - dist;
+        this.playHead = -this.totalDelta;
+
+        //Take starting position into account
+        this.dataGroup.position.x += this.startPosition;
 
         this.positions[this.vertexPos++] = this.playHead;
         this.positions[this.vertexPos++] = data;
