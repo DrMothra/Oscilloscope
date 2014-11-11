@@ -273,19 +273,23 @@ Oscilloscope.prototype.createScene = function() {
     var boxGeom = new THREE.BoxGeometry(1, 1, 1);
     var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
     var box = new THREE.Mesh(boxGeom, boxMat);
-    var head = 100;
-    var delta = 0.1;
-    var scale = 1.4;
+    var head = 0;
+    var delta = 11;
+    var scale = 2;
 
 
     var boxGroup = new THREE.Object3D();
-    boxGroup.scale.x = scale;
     boxGroup.add(box);
-    head += (delta/scale);
-    box.position.x = head/scale;
-    boxGroup.position.x = -delta/scale;
 
-    this.scene.add(boxGroup);
+    //head += delta;
+    boxGroup.scale.x = scale;
+    box.position.x += delta;
+    boxGroup.position.x -= delta;
+
+    var dist = (head - boxGroup.position.x) * scale;
+    dist +=  boxGroup.position.x;
+    boxGroup.position.x -= dist;
+    //this.scene.add(boxGroup);
 };
 
 /*
@@ -414,26 +418,26 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
         var delta = this.clock.getDelta();
-        delta *= this.timeScale;
+        this.totalDelta -= delta;
+        //delta *= this.timeScale;
 
-        this.dataGroup.position.x -= delta;
-        this.playHead += delta;
+        //this.dataGroup.position.x = -this.totalDelta;
+        //this.playHead = this.totalDelta;
 
 
         //Adjust play head
-        //var dist = this.playHead - this.dataGroup.position.x;
-        //this.playHead = (dist/this.timeScale) - (this.dataGroup.position.x/this.timeScale);
-        //this.dataGroup.position.x -= dist/this.timeScale;
+        //var dist = (0 - this.dataGroup.position.x) * this.timeScale;
+        //dist += this.dataGroup.position.x;
+        var dist = (-this.totalDelta) * this.timeScale;
+        dist += this.totalDelta;
+        this.dataGroup.position.x = this.totalDelta - dist;
+        this.playHead = -this.totalDelta + 150 - dist;
 
         this.positions[this.vertexPos++] = this.playHead;
         this.positions[this.vertexPos++] = data;
         this.positions[this.vertexPos++] = 3;
         this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0} ];
         this.geometry.attributes.position.needsUpdate = true;
-
-        //DEBUG
-        console.log("Head =", this.playHead);
-        console.log("Scale =", this.timeScale);
     }
 };
 
