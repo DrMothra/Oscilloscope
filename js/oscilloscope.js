@@ -5,6 +5,7 @@
 //Globals
 var MAXY = 35;
 var MINY = -40;
+var MAX_CONNECTION_ATTEMPTS = 10;
 
 function createHorizontalGridLines() {
     //Draw gridlines onto canvas and use as texture
@@ -108,7 +109,7 @@ Oscilloscope.prototype.init = function(container) {
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
     this.channels = [];
-    for(var i=0; i<10; ++i) {
+    for(var i=0; i<14; ++i) {
         this.channels.push( { name: '', enabled: false} );
     }
     this.gridVisible = true;
@@ -119,8 +120,13 @@ Oscilloscope.prototype.init = function(container) {
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
+    this.connectionAttempts = 0;
 
     this.startPosition = 150;
+
+    //Line colours
+    this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
+        0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
 };
 
 Oscilloscope.prototype.update = function() {
@@ -237,9 +243,9 @@ Oscilloscope.prototype.createScene = function() {
 
     //Set up data buffers
     //Simulate a float being received at 32Hz
-    //For 15 minutes
+    //For 30 minutes
     var sampleRate = 32;
-    var numPoints = 60 * sampleRate * 15;
+    var numPoints = 60 * sampleRate * 30;
 
     this.vertices = [];
     this.indices = [];
@@ -257,7 +263,7 @@ Oscilloscope.prototype.createScene = function() {
     this.positions = this.geometry.attributes.position.array;
 
     this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
-    var lineMat = new THREE.LineBasicMaterial( {color : 0x00ff00});
+    var lineMat = new THREE.LineBasicMaterial( {color : this.lineColours[0]} );
 
     this.lineMesh = new THREE.Line(this.geometry, lineMat);
     this.lineMesh.name = 'lineMesh0';
@@ -439,7 +445,10 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         this.positions[this.vertexPos++] = this.playHead;
         this.positions[this.vertexPos++] = data;
         this.positions[this.vertexPos++] = 3;
-        this.geometry.offsets = [ {start: 0, count: ++this.indexPos, index: 0} ];
+        if(++this.indexPos > this.indices.length) {
+            this.indexPos = this.vertexPos = 0;
+        }
+        this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0} ];
         this.geometry.attributes.position.needsUpdate = true;
     }
 };
@@ -455,9 +464,10 @@ Oscilloscope.prototype.displayChannel = function(id) {
             this.subscribed = true;
         }
     }
-    var channelName = $('#'+id+'Name').val();
     //Get channel id
     var chanId = id.substr(6, 2);
+    var channelName = $('#streamName'+chanId).val();
+
     var chan = parseInt(chanId);
     if(!isNaN(chan)) --chan;
 
@@ -468,7 +478,7 @@ Oscilloscope.prototype.displayChannel = function(id) {
 
     //Update status
     chanId = chan+1;
-    var elem = 'stream'+chanId+'Status';
+    var elem = 'streamStatus'+chanId;
     $('#'+elem).css('background-color', this.channels[chan].enabled ? '#00ff00' : '#ff0000');
 };
 
@@ -490,7 +500,7 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
 Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     //Adjust time scale
     var inc = 0;
-    var scaleFactor = 0.01;
+    var scaleFactor = 0.025;
     if(value > changeValue) inc = scaleFactor;
     if(value < changeValue) inc = -scaleFactor;
 
@@ -626,25 +636,57 @@ Oscilloscope.prototype.toggleScale = function() {
 
 Oscilloscope.prototype.validateChannel = function() {
     //Subscribe to pubnub channel
-    var channel = $('#channelName').val();
-    this.channel = PubNubBuffer.subscribe(channel,
+    this.channelName = $('#channelName').val();
+    this.channel = PubNubBuffer.subscribe(this.channelName,
         "sub-c-2eafcf66-c636-11e3-8dcd-02ee2ddab7fe",
         1000,
         300);
 
-    var value = null;
+    $('#waitConnection').show();
 
-    //Populate stream data
-    if(this.channel != null) {
-        this.channelName = channel;
-        var channels = this.channel.getChannelNames();
-        if(channels != null) {
-            for(var i=0; i<channels.length; ++i) {
-                console.log('Channel =', channels[i]);
-            }
+    //Wait for message to be returned
+    var _this = this;
+    this.waitTimer = setInterval(function() {
+        _this.checkConnection()}, 1000
+    );
+};
+
+Oscilloscope.prototype.checkConnection = function() {
+    //See if we have subscribed
+    var channels = this.channel.getChannelNames();
+    if(channels != null) {
+        console.log("Got channels");
+        this.subscribed = true;
+        $('#waitConnection').hide();
+        clearInterval(this.waitTimer);
+        populateChannels(channels);
+        this.connectionAttempts = 0;
+        $('#titleData').html('Output - ' +this.channelName);
+    } else {
+        ++this.connectionAttempts;
+        if(this.connectionAttempts >= MAX_CONNECTION_ATTEMPTS) {
+            this.connectionAttempts = 0;
+            $('#waitConnection').hide();
+            $('#connectionError').show();
+            clearInterval(this.waitTimer);
         }
     }
 };
+
+function populateChannels(channels) {
+    //Clear channels
+    var chan;
+    for(chan=1; chan<=14; ++chan) {
+        streamName = 'streamName' + chan;
+        $('#'+streamName).val('');
+    }
+    //Fill channel names
+    var streamName;
+    for(chan=1; chan<=channels.length; ++chan) {
+        streamName = 'streamName' + chan;
+        $('#'+streamName).val(channels[chan-1]);
+    }
+}
 
 $(document).ready(function() {
     //Initialise app
@@ -657,6 +699,10 @@ $(document).ready(function() {
     //GUI callbacks
     $(".dataChannels").on("click", function(evt) {
         app.displayChannel(evt.currentTarget.id);
+    });
+
+    $('#errorOK').on("click", function(evt) {
+        $('#connectionError').hide();
     });
 
     //GUI Controls
@@ -703,13 +749,13 @@ $(document).ready(function() {
         app.createChildWindow();
     });
 
-    /*
+
     $('#channelName').on("keydown", function(evt) {
         if(evt.which == 13) {
             app.validateChannel();
         }
     });
-    */
+
 
     /*
     $(document).keydown(function (event) {

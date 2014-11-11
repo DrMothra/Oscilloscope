@@ -46,6 +46,9 @@ canvas {
     text-align: center;
     background-color: rgba(110, 110, 110, 0.5);
 }
+.hide {
+    display: none;
+}
 #channelName {
 
 }
@@ -139,6 +142,35 @@ canvas {
     border: 1px solid gray;
     border-radius: 5px;
 }
+.infoBackground {
+    background: #a7a7a7;
+}
+.errorBackground {
+    background: #a7a7a7;
+}
+.infoFont {
+    color: #1b8de7;
+    font-size: 1.25em;
+}
+.errorFont {
+    color: #ff0000;
+    font-size: 1.25em;
+}
+.rounded {
+    border-radius: 15px;
+}
 #all {
     margin-top: 30px;
+}
+#waitConnection,
+#connectionError {
+    position: fixed;
+    width: 25%;
+    top: 25%;
+    left: 40%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+#errorOK {
+    margin-top: 3%;
 }
