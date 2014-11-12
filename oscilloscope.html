@@ -11,12 +11,12 @@
     <script type="text/javascript" src="js/Blob.js"></script>
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
-    <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
+    <script type="text/javascript" src="js/baseApp.js?v=0.2"></script>
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
     <script type="text/javascript" src="js/pubnub.min.js"></script>
     <script type="text/javascript" src="js/pubnub_buffer.js"></script>
-    <script type="text/javascript" src="js/oscilloscope.js?v=0.1"></script>
+    <script type="text/javascript" src="js/oscilloscope.js?v=0.2"></script>
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
     <link href="css/scopeStyles.css?v=0.2" rel="stylesheet" type="text/css">
@@ -46,265 +46,325 @@
         <div id="streamLabel" class="centred">
             <span>Streams</span>
         </div>
+
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName1" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream1" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus1" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream1" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus1" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue1" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName2" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream2" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus2" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream2" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus2" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue2" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName3" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream3" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus3" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream3" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus3" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue3" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName4" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream4" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus4" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream4" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus4" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue4" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName5" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream5" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus5" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream5" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus5" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue5" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName6" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream6" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus6" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream6" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus6" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue6" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
+
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName7" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream7" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus7" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream7" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus7" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue7" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName8" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream8" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus8" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream8" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus8" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue8" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName9" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream9" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus9" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream9" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus9" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue9" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
+
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName10" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream10" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus10" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream10" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus10" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue10" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName11" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream11" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus11" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream11" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus11" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue11" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName12" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream12" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus12" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream12" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus12" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue12" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
+
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName13" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream13" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus13" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream13" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus13" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue13" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>
 
         <div class="infoCell">
             <div class="pure-g">
-                <div class="pure-u-1-4 centred">
+                <div class="pure-u-1-3 centred">
                     <input type="text" id="streamName14" size="5">
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <button id="stream14" class="button-xsmall pure-button dataChannels">Enable</button>
-                </div>
-                <div class="pure-u-1-4 centred">
-                    <div id="streamStatus14" class="dataStatus">
+                <div class="pure-u-1-3">
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            <button id="stream14" class="button-xsmall pure-button dataChannels">Enable</button>
+                        </div>
+                        <div class="pure-u-1-2">
+                            <div id="streamStatus14" class="dataStatus">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="pure-u-1-4 centred">
-                    <input type="text" id="" size="5">
+                <div class="pure-u-1-3 centred">
+                    <span id="streamValue14" class="valueDisplay">000</span>
                 </div>
             </div>
         </div>

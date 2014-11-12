@@ -93,12 +93,21 @@ canvas {
 .channels {
     margin-top: 1%;
 }
+.streamStatus {
+    width: 20%;
+}
+.valueDisplay {
+    background: black;
+    color: white;
+    padding: 2% 10%;
+    vertical-align: middle;
+}
 #streamLabel {
     margin-top: 3%;
 }
 .dataStatus {
     width: 50%;
-    margin: 6% auto 2% auto;
+    margin: 6% 2%;
     height: 1em;
     overflow: hidden;
     background-color: #ff0000;

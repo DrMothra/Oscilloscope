@@ -445,9 +445,12 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         this.positions[this.vertexPos++] = this.playHead;
         this.positions[this.vertexPos++] = data;
         this.positions[this.vertexPos++] = 3;
+        updateDisplay(chanNumber+1, data);
         if(++this.indexPos > this.indices.length) {
             this.indexPos = this.vertexPos = 0;
+            console.log("Buffer rolled over");
         }
+
         this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0} ];
         this.geometry.attributes.position.needsUpdate = true;
     }
@@ -456,6 +459,7 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
 Oscilloscope.prototype.displayChannel = function(id) {
     //Toggle display for given channel
     //See if currently subscribing
+
     if(!this.subscribed) {
         //Get channel to subscribe to
         this.channelName = $('#channelName').val();
@@ -669,6 +673,8 @@ Oscilloscope.prototype.checkConnection = function() {
             $('#waitConnection').hide();
             $('#connectionError').show();
             clearInterval(this.waitTimer);
+            this.channelName = null;
+            $('#channelName').val('');
         }
     }
 };
@@ -686,6 +692,11 @@ function populateChannels(channels) {
         streamName = 'streamName' + chan;
         $('#'+streamName).val(channels[chan-1]);
     }
+}
+
+function updateDisplay(channel, data) {
+    //Update data display
+    $('#streamValue'+channel).html(data);
 }
 
 $(document).ready(function() {
