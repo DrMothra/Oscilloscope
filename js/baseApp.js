@@ -40,7 +40,7 @@ BaseApp.prototype.createRenderer = function() {
     this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     this.renderer.setClearColor(0x5c5f64, 1.0);
     this.renderer.shadowMapEnabled = true;
-    this.renderer.setSize(this.container.clientWidth*0.97, window.innerHeight*0.8);
+    this.renderer.setSize(this.container.clientWidth, window.innerHeight*0.8);
     this.container.appendChild( this.renderer.domElement );
     var _this = this;
 
@@ -107,7 +107,7 @@ BaseApp.prototype.windowResize = function(event) {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
 
-    this.renderer.setSize( this.container.clientWidth*0.97, window.innerHeight*0.8 );
+    this.renderer.setSize( this.container.clientWidth, window.innerHeight*0.8 );
     //console.log('Size =', )
 };
 

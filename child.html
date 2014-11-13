@@ -11,7 +11,7 @@
     <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
-    <script type="text/javascript" src="js/oscilloscopeChild.js?v=0.1"></script>
+    <script type="text/javascript" src="js/oscilloscopeChild.js?v=0.2"></script>
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
     <link href="css/scopeStyles.css?v=0.2" rel="stylesheet" type="text/css">
@@ -20,8 +20,16 @@
 <!-- Stats output -->
 <div id="Stats-output">
 </div>
-<div class="mainTitle">
-    <p>Oscilloscope - Child</p>
+<div class="pure-g mainTitle">
+    <div class="pure-u-1-8">
+
+    </div>
+    <div class="pure-u-5-8 centred">
+        <span>Oscilloscope - Child</span>
+    </div>
+    <div class="pure-u-1-4 centred">
+        <span>Output Controls</span>
+    </div>
 </div>
 <div class="pure-g">
     <div class="pure-u-1-8">
@@ -30,19 +38,27 @@
     <div id="WebGL-output" class="pure-u-5-8">
 
     </div>
-    <div class="controls pure-u-1-4">
-        <div class="centred controlTitle">
-            Output Controls
+    <div id="controlContainer" class="controls pure-u-1-4">
+        <div class="centred dialControl">
+            <input id="ampScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
+                   data-cursor=true data-min="1">
+        </div>
+        <div class="headerContainer centred">
+            <span class="header">Amplitude</span>
         </div>
         <div class="centred dialControl">
-            <input id="ampScale" value="1" data-width="70%" data-height="70%" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
+            <input id="timeScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
                    data-cursor=true data-min="1">
-            <p class="header">Amplitude</p>
+        </div>
+        <div class="headerContainer centred">
+            <span class="header">Time</span>
         </div>
         <div class="centred dialControl">
-            <input id="timeScale" value="1" data-width="100" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
+            <input id="yShift" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
                    data-cursor=true data-min="1">
-            <p class="header">Time</p>
+        </div>
+        <div class="headerContainer centred">
+            <span class="header">Y-Shift</span>
         </div>
     </div>
 </div>
@@ -52,9 +68,9 @@
     </div>
     <div class="pure-u-3-5">
         <div class="timeControls">
-            <button id="timeBack" class="button-xsmall pure-button button-control"></button>
-            <button id="timePause" class="button-xsmall pure-button button-control"></button>
-            <button id="timeForward" class="button-xsmall pure-button button-control"></button>
+            <button id="timeBack" class="button-xxsmall pure-button button-control"></button>
+            <button id="timePause" class="button-xxsmall pure-button button-control"></button>
+            <button id="timeForward" class="button-xxsmall pure-button button-control"></button>
         </div>
     </div>
     <div class="pure-u-1-5">

@@ -108,15 +108,13 @@ Oscilloscope.prototype.init = function(container) {
     this.playHead = 0;
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
-    this.channels = [];
-    for(var i=0; i<14; ++i) {
-        this.channels.push( { name: '', enabled: false} );
-    }
+
     this.gridVisible = true;
     this.scaleVisible = true;
 
     this.deltaScale = 2;
     this.timeScale = 1;
+    this.numStreams = 14;
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
@@ -247,32 +245,38 @@ Oscilloscope.prototype.createScene = function() {
     var sampleRate = 32;
     var numPoints = 60 * sampleRate * 30;
 
-    this.vertices = [];
-    this.indices = [];
-    for(var t=0; t<numPoints; ++t) {
-        this.vertices.push(0, 0, 0);
-        this.indices.push(t);
-    }
-    //Create geometry
-    this.geometry = new THREE.BufferGeometry();
-    this.geometry.dynamic = true;
-    this.geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(this.indices), 1 ) );
-    this.geometry.addAttribute( 'position', new THREE.BufferAttribute(new Float32Array(this.vertices), 3 ) );
-    this.geometry.computeBoundingSphere();
-
-    this.positions = this.geometry.attributes.position.array;
-
-    this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
-    var lineMat = new THREE.LineBasicMaterial( {color : this.lineColours[0]} );
-
-    this.lineMesh = new THREE.Line(this.geometry, lineMat);
-    this.lineMesh.name = 'lineMesh0';
-    this.lineMesh.visible = true;
-    this.lineMesh.frustumCulled = false;
+    //Create buffer for each stream
+    this.channels = [];
+    var vertices;
+    var indices;
+    var geometry;
+    var positions;
+    var lineMat;
+    var lineMesh;
     var dataGroup = new THREE.Object3D();
-    dataGroup.scale.y = 1;
     dataGroup.name = 'dataStreams';
-    dataGroup.add(this.lineMesh);
+
+    for(var channel=0; channel<this.numStreams; ++channel) {
+        vertices = new Array(numPoints*3);
+        indices = new Array(numPoints);
+        for(var t=0; t<numPoints; ++t) {
+            indices[t] = t;
+        }
+        geometry = new THREE.BufferGeometry();
+        geometry.dynamic = true;
+        geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
+        geometry.addAttribute( 'position', new THREE.BufferAttribute(new Float32Array(vertices), 3 ) );
+        //geometry.computeBoundingSphere();
+        positions = geometry.attributes.position.array;
+        geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
+        lineMat = new THREE.LineBasicMaterial( {color : this.lineColours[channel]} );
+        lineMesh = new THREE.Line(geometry, lineMat);
+        lineMesh.name = 'lineMesh'+channel;
+        lineMesh.frustumCulled = false;
+        dataGroup.add(lineMesh);
+        this.channels.push( {name: '', enabled: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
+    }
+
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
 
@@ -428,6 +432,8 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
+        var channelData = this.channels[chanNumber];
+
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
         var delta = this.clock.getDelta();
@@ -442,17 +448,19 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         //Take starting position into account
         this.dataGroup.position.x += this.startPosition;
 
-        this.positions[this.vertexPos++] = this.playHead;
-        this.positions[this.vertexPos++] = data;
-        this.positions[this.vertexPos++] = 3;
+        channelData.position[channelData.vertexPos++] = this.playHead;
+        channelData.position[channelData.vertexPos++] = data;
+        channelData.position[channelData.vertexPos++] = 3;
+
         updateDisplay(chanNumber+1, data);
-        if(++this.indexPos > this.indices.length) {
-            this.indexPos = this.vertexPos = 0;
+
+        if(++channelData.indexPos > channelData.maxIndex) {
+            channelData.indexPos = channelData.vertexPos = 0;
             console.log("Buffer rolled over");
         }
 
-        this.geometry.offsets = [ {start: 0, count: this.indexPos, index: 0} ];
-        this.geometry.attributes.position.needsUpdate = true;
+        channelData.geometry.offsets = [ {start: 0, count: channelData.indexPos, index: 0} ];
+        channelData.geometry.attributes.position.needsUpdate = true;
     }
 };
 
@@ -479,6 +487,12 @@ Oscilloscope.prototype.displayChannel = function(id) {
 
     this.channels[chan].name = channelName;
     this.channels[chan].enabled = !this.channels[chan].enabled;
+
+    //Update visible channels
+    this.numVisChannels = 0;
+    for(var i=0; i<this.numStreams; ++i) {
+        this.channels[chan].enabled ? ++this.numVisChannels : null;
+    }
 
     //Update status
     chanId = chan+1;

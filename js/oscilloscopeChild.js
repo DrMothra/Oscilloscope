@@ -293,6 +293,19 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     }
 };
 
+Oscilloscope.prototype.onYShift = function(value, changeValue) {
+    //Adjust y position of values
+    var inc = 0;
+    var scaleFactor = 0.1;
+    if(value > changeValue) inc = scaleFactor;
+    if(value < changeValue) inc = -scaleFactor;
+
+    var dataGroup = this.scene.getObjectByName('dataStreams', true);
+    if(dataGroup) {
+        dataGroup.position.y += inc;
+    }
+};
+
 Oscilloscope.prototype.showPreviousTime = function(value) {
     //Forward to next page of data
     if(this.displayTime - this.timeInc < 0) return;
@@ -370,6 +383,12 @@ $(document).ready(function() {
     $('#timeScale').knob({
         change : function(value) {
             app.onScaleTime(value, this.cv);
+        }
+    });
+
+    $('#yShift').knob({
+        change : function(value) {
+            app.onYShift(value, this.cv);
         }
     });
 

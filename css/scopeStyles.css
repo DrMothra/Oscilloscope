@@ -34,15 +34,21 @@ canvas {
 .centred {
     text-align: center;
 }
+.button-xxsmall {
+    font-size: 35%;
+    vertical-align: middle;
+}
 .button-xsmall {
     font-size: 70%;
     vertical-align: middle;
 }
+.button-medium {
+    font-size: 100%;
+}
 .button-control {
-    width: 50px;
-    height: 36px;
     background-repeat: no-repeat;
     background-position: center;
+    background-size: 120% 120%;
     text-align: center;
     background-color: rgba(110, 110, 110, 0.5);
 }
@@ -119,11 +125,7 @@ canvas {
     letter-spacing: normal;
 }
 .timeControls {
-    width: 50%;
-    text-align: center;
-    padding: 10px;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 0 1%;
 }
 .infoCell {
     margin-top: 10px;
