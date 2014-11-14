@@ -330,13 +330,45 @@ Oscilloscope.prototype.showNextTime = function(value) {
     }
 };
 
-Oscilloscope.prototype.displayChannel = function(channel) {
+Oscilloscope.prototype.displayChannels = function(channelData) {
     //Display data for given channel
-    if(channel < 0) return;
+    if(channelData == null) return;
 
-    var line = this.scene.getObjectByName('lineMesh'+channel, true);
-    if(line) {
-        line.visible = true;
+    //Subscribe to channel
+    this.channel = PubNubBuffer.subscribe(channelData.channelName,
+        "sub-c-2eafcf66-c636-11e3-8dcd-02ee2ddab7fe",
+        1000,
+        300);
+
+    //Set up geometry
+    //Create buffer for each stream
+    this.channels = [];
+    var vertices;
+    var indices;
+    var geometry;
+    var positions;
+    var lineMat;
+    var lineMesh;
+    var dataGroup = new THREE.Object3D();
+    dataGroup.name = 'dataStreams';
+    for(var channel=0; channel<channelData.streams.length; ++channel) {
+        vertices = new Array(numPoints*3);
+        indices = new Array(numPoints);
+        for(var t=0; t<numPoints; ++t) {
+            indices[t] = t;
+        }
+        geometry = new THREE.BufferGeometry();
+        geometry.dynamic = true;
+        geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
+        geometry.addAttribute( 'position', new THREE.BufferAttribute(new Float32Array(vertices), 3 ) );
+        positions = geometry.attributes.position.array;
+        geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
+        lineMat = new THREE.LineBasicMaterial( {color : this.lineColours[channel]} );
+        lineMesh = new THREE.Line(geometry, lineMat);
+        lineMesh.name = 'lineMesh'+channel;
+        lineMesh.frustumCulled = false;
+        dataGroup.add(lineMesh);
+        this.channels.push( {name: '', enabled: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
     }
 };
 
@@ -368,9 +400,12 @@ $(document).ready(function() {
     //app.createGUI();
 
     //Get channel data from input
-    var channel = parseParams('channels', window.location.search);
+    var channel = parseParams('channelName', window.location.search);
     console.log('Channel =', channel);
-    app.displayChannel(channel);
+    var streams = [];
+    streams = parseParams('streams', window.location.search);
+
+    app.displayChannels(opener.results);
 
     //GUI Controls
     $('#ampScale').knob({

@@ -266,7 +266,6 @@ Oscilloscope.prototype.createScene = function() {
         geometry.dynamic = true;
         geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
         geometry.addAttribute( 'position', new THREE.BufferAttribute(new Float32Array(vertices), 3 ) );
-        //geometry.computeBoundingSphere();
         positions = geometry.attributes.position.array;
         geometry.offsets = [ {start: 0, count: this.indexPos, index: 0}];
         lineMat = new THREE.LineBasicMaterial( {color : this.lineColours[channel]} );
@@ -612,7 +611,10 @@ Oscilloscope.prototype.createChildWindow = function() {
     var childHeight = window.innerHeight/2;
 
     var props = 'height='+childHeight+' width='+childWidth+' location=0';
-    window.open("child.html?channels="+this.channels[0], '_blank', props);
+    var streams = [];
+    streams.push('wave');
+    window.results = { channelName: this.channelName, streams: streams};
+    window.open("child.html", '_blank', props);
 };
 
 /*
