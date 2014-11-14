@@ -48,7 +48,6 @@ canvas {
 .button-control {
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 120% 120%;
     text-align: center;
     background-color: rgba(110, 110, 110, 0.5);
 }
@@ -65,15 +64,18 @@ canvas {
     text-align: center;
 }
 #timeBack {
-    background-image: url("../images/backward.png");
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
 }
+.playBack {
+    padding: 0;
+    border: 0;
+    background: #6e6e6e;
+}
 #timePause {
-    background-image: url("../images/pause.png");
+
 }
 #timeForward {
-    background-image: url("../images/forward.png");
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
 }
@@ -124,8 +126,8 @@ canvas {
 .streamInfo {
     letter-spacing: normal;
 }
-.timeControls {
-    padding: 0 1%;
+.timeControls img {
+    width: 85%;
 }
 .infoCell {
     margin-top: 10px;
