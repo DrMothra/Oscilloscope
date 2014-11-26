@@ -108,17 +108,17 @@ canvas {
     background: black;
     color: white;
     padding: 2% 10%;
-    vertical-align: middle;
+    margin: 0;
 }
 #streamLabel {
     margin-top: 3%;
 }
 .dataStatus {
-    width: 50%;
     margin: 6% 2%;
     height: 1em;
-    overflow: hidden;
+
     background-color: #ff0000;
+    display: inline;
 }
 #controlContainer {
     margin-top: 1%;
@@ -172,6 +172,11 @@ canvas {
 .rounded {
     border-radius: 15px;
 }
+.indicator {
+    width: 12.5%;
+    padding: 0;
+}
+
 #all {
     margin-top: 30px;
 }
