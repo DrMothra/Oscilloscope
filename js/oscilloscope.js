@@ -496,7 +496,8 @@ Oscilloscope.prototype.displayChannel = function(id) {
     //Update status
     chanId = chan+1;
     var elem = 'streamStatus'+chanId;
-    $('#'+elem).css('background-color', this.channels[chan].enabled ? '#00ff00' : '#ff0000');
+    var image = this.channels[chan].enabled ? 'images/green_circle.png' : 'images/red_circle.png';
+    $('#'+elem).attr('src', image);
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {

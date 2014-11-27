@@ -34,7 +34,7 @@ canvas {
 .centred {
     text-align: center;
 }
-.flow {
+.noflow {
     overflow: hidden;
 }
 .button-xxsmall {
@@ -44,8 +44,7 @@ canvas {
 .button-xsmall {
     width: 65%;
     font-size: 0.7em;
-    padding: 2% 0;
-    vertical-align: text-bottom;
+    padding: 5% 0;
     border-radius: 5px;
     border: none;
 }
@@ -109,11 +108,15 @@ canvas {
     margin-top: 1%;
 }
 .streamStatus {
+    padding-top: 1%;
     width: 20%;
     vertical-align: text-bottom;
 }
 .streamName {
-    width: 60%;
+    width: 67.5%;
+}
+.streamToggle {
+    margin-top: 0.75%;
 }
 .valueDisplay {
     background: black;
@@ -121,6 +124,8 @@ canvas {
     padding: 2% 10%;
     margin: 0;
     vertical-align: text-bottom;
+    border-radius: 5px;
+    font-size: 1em;
 }
 #streamLabel {
     margin-top: 3%;
