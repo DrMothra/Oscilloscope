@@ -107,6 +107,10 @@
         return this.channelnames;
     };
 
+    Channel.prototype.getChannelTypes = function() {
+        return this.channeltypes;
+    };
+
 
     PubNubBuffer.subscribe = function(channel, subscribe_key, latency, size){
 

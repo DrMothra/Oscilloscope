@@ -114,9 +114,10 @@ canvas {
 }
 .streamName {
     width: 67.5%;
+    vertical-align: middle;
 }
 .streamToggle {
-    margin-top: 0.75%;
+
 }
 .valueDisplay {
     background: black;

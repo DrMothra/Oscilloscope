@@ -273,7 +273,7 @@ Oscilloscope.prototype.createScene = function() {
         lineMesh.name = 'lineMesh'+channel;
         lineMesh.frustumCulled = false;
         dataGroup.add(lineMesh);
-        this.channels.push( {name: '', enabled: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
+        this.channels.push( {name: '', type: 'float', enabled: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
     }
 
     this.scene.add(dataGroup);
@@ -484,7 +484,6 @@ Oscilloscope.prototype.displayChannel = function(id) {
 
     if(chan < 0 || chan >= this.channels.length) return;
 
-    this.channels[chan].name = channelName;
     this.channels[chan].enabled = !this.channels[chan].enabled;
 
     //Update visible channels
@@ -681,6 +680,8 @@ Oscilloscope.prototype.checkConnection = function() {
         $('#waitConnection').hide();
         clearInterval(this.waitTimer);
         populateChannels(channels);
+        this.updateChannelNames(channels);
+        this.updateChannelTypes(this.channel.getChannelTypes());
         this.connectionAttempts = 0;
         $('#titleData').html('Output - ' +this.channelName);
     } else {
@@ -693,6 +694,20 @@ Oscilloscope.prototype.checkConnection = function() {
             this.channelName = null;
             $('#channelName').val('');
         }
+    }
+};
+
+Oscilloscope.prototype.updateChannelNames = function(channels) {
+    //Update channel structure with names
+    for(var i=0; i<channels.length; ++i) {
+        this.channels[i].name = channels[i];
+    }
+};
+
+Oscilloscope.prototype.updateChannelTypes = function(channels) {
+    //Update channel structure with types
+    for(var i=0; i<channels.length; ++i) {
+        this.channels[i].type = channels[i];
     }
 };
 
