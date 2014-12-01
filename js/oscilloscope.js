@@ -129,6 +129,8 @@ Oscilloscope.prototype.init = function(container) {
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
 
+    this.iterations = 0;
+
     this.maxDisplayDigits = 6;
     this.gridVisible = true;
     this.scaleVisible = true;
@@ -296,7 +298,7 @@ Oscilloscope.prototype.createScene = function() {
         lineMesh.name = 'lineMesh'+channel;
         lineMesh.frustumCulled = false;
         dataGroup.add(lineMesh);
-        this.channels.push( {name: '', type: 'float', enabled: false, outBound: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
+        this.channels.push( {name: '', type: 'float', enabled: false, maxBound: false, minBound: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
     }
 
     this.scene.add(dataGroup);
@@ -482,7 +484,21 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         channelData.position[channelData.vertexPos++] = 3;
 
         updateDisplay(chanNumber+1, data, this.channels[chanNumber].type, this.maxDisplayDigits);
-        checkBounds(chanNumber+1, data, this.maxDataValue/this.yScale);
+        var limit = this.maxDataValue/this.yScale;
+        var boundUpper = data > limit;
+        var boundLower = data < -limit;
+        if(this.channels[chanNumber].maxBound != boundUpper) {
+            updateBoundsIndicator(boundUpper, true, chanNumber+1);
+            //DEBUG
+            console.log('Indicator updated');
+        }
+        if(this.channels[chanNumber].minBound != boundLower) {
+            updateBoundsIndicator(boundUpper, false, chanNumber+1);
+            //DEBUG
+            console.log('Indicator updated');
+        }
+        this.channels[chanNumber].maxBound = boundUpper;
+        this.channels[chanNumber].minBound = boundLower;
 
         if(++channelData.indexPos > channelData.maxIndex) {
             channelData.indexPos = channelData.vertexPos = 0;
@@ -531,6 +547,13 @@ Oscilloscope.prototype.displayChannel = function(id) {
     var elem = 'streamStatus'+chanId;
     var image = this.channels[chan].enabled ? 'images/green_circle.png' : 'images/red_circle.png';
     $('#'+elem).attr('src', image);
+    //Update indicators
+    if(!this.channels[chan].enabled) {
+        updateBoundsIndicator(false, true, chan+1);
+        this.channels[chan].maxBound = false;
+        updateBoundsIndicator(false, false, chan+1);
+        this.channels[chan].minBound = false;
+    }
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
@@ -769,7 +792,7 @@ function updateDisplay(channel, data, type, maxDigits) {
     var elem = $('#streamValue'+channel);
     var digits = getValueRange(data);
     if(digits == null) {
-        data = data.toExponential(2);
+        data = data.toExponential(1);
     } else if(type == 'int') {
         if(digits < maxDigits) {
             //Pad out number
@@ -786,19 +809,14 @@ function updateDisplay(channel, data, type, maxDigits) {
     elem.html(data);
 }
 
-function resetBounds(channel) {
-    //Reset bounds status
-    $('#indicatorUpStream'+channel).attr('src', 'images/arrowUp.png');
-    $('#indicatorDownStream'+channel).attr('src', 'images/arrowDown.png');
-}
+function updateBoundsIndicator(on_off, up_down, channel) {
+    //Update indicators
+    var elem = up_down ? $('#indicatorUpStream'+channel) : $('#indicatorDownStream'+channel);
+    var image = up_down ? 'images/arrowUp' : 'images/arrowDown';
 
-function checkBounds(channel, data, limit) {
-    //See if data is off-screen
-    if(data > limit) {
-        $('#indicatorUpStream'+channel).attr('src', 'images/arrowUpOn.png');
-    } else if(data < -limit) {
-        $('#indicatorDownStream'+channel).attr('src', 'images/arrowDownOn.png');
-    }
+    image = on_off ? image+'On.png' : image+'.png';
+
+    elem.attr('src', image);
 }
 
 $(document).ready(function() {
