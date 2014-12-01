@@ -79,6 +79,26 @@ function createVerticalGridLines() {
     return canvas;
 }
 
+function getValueRange(number) {
+    //Determine how many digits in number
+    var digits = 1;
+    var range = 10;
+    var maxRange = 1000000;
+    var rangeFound = false;
+
+    if(number >= maxRange) return null;
+
+    while(!rangeFound) {
+        if(number < range) {
+            rangeFound = true;
+        } else {
+            ++digits;
+            range *= 10;
+        }
+    }
+
+    return digits;
+}
 //Init this app from base
 function Oscilloscope() {
     BaseApp.call(this);
@@ -109,8 +129,11 @@ Oscilloscope.prototype.init = function(container) {
     this.startTimeOffset = 60.0;
     this.animationSpeed = 0.05;
 
+    this.maxDisplayDigits = 6;
     this.gridVisible = true;
     this.scaleVisible = true;
+    this.yScale = 1;
+    this.maxDataValue = 100;
 
     this.deltaScale = 2;
     this.timeScale = 1;
@@ -273,7 +296,7 @@ Oscilloscope.prototype.createScene = function() {
         lineMesh.name = 'lineMesh'+channel;
         lineMesh.frustumCulled = false;
         dataGroup.add(lineMesh);
-        this.channels.push( {name: '', type: 'float', enabled: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
+        this.channels.push( {name: '', type: 'float', enabled: false, outBound: false, geometry: geometry, indexPos: 0, maxIndex: numPoints, vertexPos: 0, position: positions } );
     }
 
     this.scene.add(dataGroup);
@@ -305,6 +328,13 @@ Oscilloscope.prototype.createScene = function() {
 
     this.scene.add(boxGroup);
     this.scene.add(box2);
+    */
+    /*
+    var boxGeom = new THREE.BoxGeometry(2, 2, 2);
+    var boxMat = new THREE.MeshLambertMaterial( {color: 0xff0000});
+    var box = new THREE.Mesh(boxGeom, boxMat);
+    box.position.y = 100;
+    this.scene.add(box);
     */
 };
 
@@ -451,7 +481,8 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         channelData.position[channelData.vertexPos++] = data;
         channelData.position[channelData.vertexPos++] = 3;
 
-        updateDisplay(chanNumber+1, data);
+        updateDisplay(chanNumber+1, data, this.channels[chanNumber].type, this.maxDisplayDigits);
+        checkBounds(chanNumber+1, data, this.maxDataValue/this.yScale);
 
         if(++channelData.indexPos > channelData.maxIndex) {
             channelData.indexPos = channelData.vertexPos = 0;
@@ -470,9 +501,12 @@ Oscilloscope.prototype.displayChannel = function(id) {
     if(!this.subscribed) {
         //Get channel to subscribe to
         this.channelName = $('#channelName').val();
-        if(this.channelName != null) {
+        if(this.channelName) {
             this.subscribe();
             this.subscribed = true;
+        } else {
+            console.log('No channel name');
+            return;
         }
     }
     //Get channel id
@@ -511,6 +545,9 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
         //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
         streams.scale.y += inc;
         if(streams.scale.y <= 0) streams.scale.y = 0.01;
+        this.yScale = streams.scale.y;
+        //DEBUG
+        console.log('Scale =', this.yScale);
     }
 };
 
@@ -726,9 +763,42 @@ function populateChannels(channels) {
     }
 }
 
-function updateDisplay(channel, data) {
+function updateDisplay(channel, data, type, maxDigits) {
     //Update data display
-    $('#streamValue'+channel).html(data);
+    //Format data
+    var elem = $('#streamValue'+channel);
+    var digits = getValueRange(data);
+    if(digits == null) {
+        data = data.toExponential(2);
+    } else if(type == 'int') {
+        if(digits < maxDigits) {
+            //Pad out number
+            var pad = (maxDigits-digits)*0.66;
+            pad += 'em';
+            elem.css('padding-left', pad);
+        }
+    } else if(type == 'float') {
+        if(digits < maxDigits) {
+            data = data.toFixed(maxDigits-digits);
+        }
+    }
+
+    elem.html(data);
+}
+
+function resetBounds(channel) {
+    //Reset bounds status
+    $('#indicatorUpStream'+channel).attr('src', 'images/arrowUp.png');
+    $('#indicatorDownStream'+channel).attr('src', 'images/arrowDown.png');
+}
+
+function checkBounds(channel, data, limit) {
+    //See if data is off-screen
+    if(data > limit) {
+        $('#indicatorUpStream'+channel).attr('src', 'images/arrowUpOn.png');
+    } else if(data < -limit) {
+        $('#indicatorDownStream'+channel).attr('src', 'images/arrowDownOn.png');
+    }
 }
 
 $(document).ready(function() {

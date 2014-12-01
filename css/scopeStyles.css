@@ -122,7 +122,7 @@ canvas {
 .valueDisplay {
     background: black;
     color: white;
-    padding: 2% 10%;
+    padding: 2% 5% 2% 0.5em;
     margin: 0;
     vertical-align: text-bottom;
     border-radius: 5px;
