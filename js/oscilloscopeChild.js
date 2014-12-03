@@ -110,6 +110,11 @@ Oscilloscope.prototype.init = function(container) {
     this.defaultSampleRate = 32;
     this.defaultSampleTimeMins = 30;
     this.numPoints = this.defaultSampleRate * 60 * this.defaultSampleTimeMins;
+
+    this.numDisplayChannels = 5;
+    //Line colours
+    this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
+        0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
 };
 
 Oscilloscope.prototype.update = function() {
@@ -128,6 +133,8 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
+        //DEBUG
+        console.log('Got data');
         var channelData = this.channels[chanNumber];
 
         //Adjust play head
@@ -174,6 +181,39 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         channelData.geometry.attributes.position.needsUpdate = true;
     }
 };
+
+function updateDisplay(channel, data, type, maxDigits) {
+    //Update data display
+    //Format data
+    var elem = $('#streamValue'+channel);
+    var digits = getValueRange(data);
+    if(digits == null) {
+        data = data.toExponential(1);
+    } else if(type == 'int') {
+        if(digits < maxDigits) {
+            //Pad out number
+            var pad = (maxDigits-digits)*0.66;
+            pad += 'em';
+            elem.css('padding-left', pad);
+        }
+    } else if(type == 'float') {
+        if(digits < maxDigits) {
+            data = data.toFixed(maxDigits-digits);
+        }
+    }
+
+    elem.html(data);
+}
+
+function updateBoundsIndicator(on_off, up_down, channel) {
+    //Update indicators
+    var elem = up_down ? $('#indicatorUpStream'+channel) : $('#indicatorDownStream'+channel);
+    var image = up_down ? 'images/arrowUp' : 'images/arrowDown';
+
+    image = on_off ? image+'On.png' : image+'.png';
+
+    elem.attr('src', image);
+}
 
 Oscilloscope.prototype.createScene = function() {
     //Init base createsScene
@@ -239,6 +279,8 @@ Oscilloscope.prototype.createScene = function() {
     dataGroup.position.x = this.startTimeOffset;
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
+
+    this.camera.position.set( 0, 0, 110 );
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
@@ -330,8 +372,7 @@ Oscilloscope.prototype.displayStreams = function(streams) {
     var positions;
     var lineMat;
     var lineMesh;
-    var dataGroup = new THREE.Object3D();
-    dataGroup.name = 'dataStreams';
+
     for(var channel=0; channel<streams.length; ++channel) {
         vertices = new Array(this.numPoints*3);
         indices = new Array(this.numPoints);
@@ -348,7 +389,7 @@ Oscilloscope.prototype.displayStreams = function(streams) {
         lineMesh = new THREE.Line(geometry, lineMat);
         lineMesh.name = 'lineMesh'+channel;
         lineMesh.frustumCulled = false;
-        dataGroup.add(lineMesh);
+        this.dataGroup.add(lineMesh);
         this.channels.push( {name: '', type: 'float', enabled: true, maxBound: false, minBound: false, geometry: geometry, indexPos: 0, maxIndex: this.numPoints, vertexPos: 0, position: positions } );
     }
 };

@@ -147,6 +147,7 @@ Oscilloscope.prototype.init = function(container) {
 
     this.startPosition = 150;
 
+    this.numDisplayChannels = 14;
     //Line colours
     this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
         0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
@@ -774,7 +775,7 @@ Oscilloscope.prototype.updateChannelTypes = function(channels) {
 function populateChannels(channels) {
     //Clear channels
     var chan;
-    for(chan=1; chan<=14; ++chan) {
+    for(chan=1; chan<=this.numDisplayChannels; ++chan) {
         streamName = 'streamName' + chan;
         $('#'+streamName).val('');
     }

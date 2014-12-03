@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <title>Scope Child Window</title>
 
-    <script type="text/javascript" src="js/three.js?v=68"></script>
     <script type="text/javascript" src="js/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="js/three.js?v=68"></script>
+    <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
     <script type="text/javascript" src="js/TrackballControls.js"></script>
 
-    <script type="text/javascript" src="js/baseApp.js?v=0.1"></script>
+
     <script type="text/javascript" src="js/stats.js"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
+    <script type="text/javascript" src="js/pubnub.min.js"></script>
+    <script type="text/javascript" src="js/pubnub_buffer.js"></script>
     <script type="text/javascript" src="js/oscilloscopeChild.js?v=0.2"></script>
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
@@ -32,13 +35,24 @@
     </div>
 </div>
 <div class="pure-g">
-    <div class="pure-u-1-8">
+    <div class="pure-u-1-6">
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-3-8 centred">
+                    <input type="text" id="streamName1" class="streamChildName" size="5">
+                </div>
+                <div class="pure-u-5-8 childValue">
+                    <span id="streamValue1" class="valueChildDisplay">000000</span>
+                    <img id="indicatorUpStream1" class="indicator" src="images/arrowUp.png">
+                    <img id="indicatorDownStream1" class="indicator" src="images/arrowDown.png">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="WebGL-output" class="pure-u-2-3">
 
     </div>
-    <div id="WebGL-output" class="pure-u-5-8">
-
-    </div>
-    <div id="controlContainer" class="controls pure-u-1-4">
+    <div id="controlContainer" class="controls pure-u-1-6">
         <div class="centred dialControl">
             <input id="ampScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
                    data-cursor=true data-min="1">

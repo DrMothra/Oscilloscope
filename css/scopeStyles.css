@@ -116,6 +116,10 @@ canvas {
     width: 67.5%;
     vertical-align: middle;
 }
+.streamChildName {
+    width: 80%;
+    vertical-align: text-bottom;
+}
 .streamToggle {
 
 }
@@ -127,6 +131,18 @@ canvas {
     vertical-align: text-bottom;
     border-radius: 5px;
     font-size: 1em;
+}
+.valueChildDisplay {
+    background: black;
+    color: white;
+    padding: 2% 5% 2% 0.5em;
+    margin: 0;
+
+    border-radius: 5px;
+    font-size: 0.8em;
+}
+.childValue {
+    padding-top: 1%;
 }
 #streamLabel {
     margin-top: 3%;
