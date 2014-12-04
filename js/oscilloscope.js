@@ -672,9 +672,9 @@ Oscilloscope.prototype.createChildWindow = function() {
     var childHeight = window.innerHeight/2;
 
     var props = 'height='+childHeight+' width='+childWidth+' location=0';
-    var streams = [];
-    streams.push('wave');
-    window.visData = { channelName: this.channelName, streams: streams};
+    var channels = [];
+    channels.push( {name: 'wave', type: 'int'} );
+    window.visData = { channelName: this.channelName, streams: channels};
     window.open("child.html", '_blank', props);
 };
 

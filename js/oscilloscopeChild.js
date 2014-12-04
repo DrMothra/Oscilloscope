@@ -111,7 +111,13 @@ Oscilloscope.prototype.init = function(container) {
     this.defaultSampleTimeMins = 30;
     this.numPoints = this.defaultSampleRate * 60 * this.defaultSampleTimeMins;
 
+    this.playHead = 0;
     this.numDisplayChannels = 5;
+    this.maxDisplayDigits = 6;
+    this.startPosition = 75;
+    this.timeScale = 1;
+    this.yScale = 1;
+    this.maxDataValue = 40;
     //Line colours
     this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
         0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
@@ -133,8 +139,6 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
-        //DEBUG
-        console.log('Got data');
         var channelData = this.channels[chanNumber];
 
         //Adjust play head
@@ -182,6 +186,21 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     }
 };
 
+function populateChannels(streams) {
+    //Clear channels
+    var chan;
+    for(chan=1; chan<=this.numDisplayChannels; ++chan) {
+        streamName = 'streamName' + chan;
+        $('#'+streamName).val('');
+    }
+    //Fill channel names
+    var streamName;
+    for(chan=1; chan<=streams.length; ++chan) {
+        streamName = 'streamName' + chan;
+        $('#'+streamName).val(streams[chan-1].name);
+    }
+}
+
 function updateDisplay(channel, data, type, maxDigits) {
     //Update data display
     //Format data
@@ -205,6 +224,27 @@ function updateDisplay(channel, data, type, maxDigits) {
     elem.html(data);
 }
 
+function getValueRange(number) {
+    //Determine how many digits in number
+    var digits = 1;
+    var range = 10;
+    var maxRange = 1000000;
+    var rangeFound = false;
+
+    if(number >= maxRange) return null;
+
+    while(!rangeFound) {
+        if(number < range) {
+            rangeFound = true;
+        } else {
+            ++digits;
+            range *= 10;
+        }
+    }
+
+    return digits;
+}
+
 function updateBoundsIndicator(on_off, up_down, channel) {
     //Update indicators
     var elem = up_down ? $('#indicatorUpStream'+channel) : $('#indicatorDownStream'+channel);
@@ -220,37 +260,46 @@ Oscilloscope.prototype.createScene = function() {
     BaseApp.prototype.createScene.call(this);
 
     //Load background grid
-    var gridGeom = new THREE.PlaneGeometry(150, 100);
+    var width = 420;
+    var height = (2*width)/3;
+    var gridGeom = new THREE.PlaneGeometry(width, height);
     var texture = THREE.ImageUtils.loadTexture("images/grid.png");
     var gridMaterial = new THREE.MeshLambertMaterial({ map : texture, transparent: true, opacity: 0.5});
     var grid = new THREE.Mesh(gridGeom, gridMaterial);
-    grid.position.y = 0.75;
+    grid.name = 'grid';
+    grid.position.y = 0;
     grid.position.z = -0.1;
     this.scene.add(grid);
 
     //Scale lines
+    var scaleGroup = new THREE.Object3D();
+    scaleGroup.name = 'scaleGroup';
     var canvas = createHorizontalGridLines();
     var tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
 
-    var yHorizOffset = 1.5;
-    var linesGeom = new THREE.PlaneGeometry(55, 5);
+    var yHorizOffset = 0.75;
+    var horizGridScale = 1;
+    var linesGeom = new THREE.PlaneGeometry(125, 5);
     var lineMaterial = new THREE.MeshLambertMaterial( {map : tex, transparent: true, opacity: 0.75});
     var hLinesLeft = new THREE.Mesh(linesGeom, lineMaterial);
-    hLinesLeft.position.x = -55;
+    hLinesLeft.scale.x = horizGridScale;
+    hLinesLeft.position.x = -125;
     hLinesLeft.position.y = yHorizOffset;
     var hLinesMid = new THREE.Mesh(linesGeom, lineMaterial);
+    hLinesMid.scale.x = horizGridScale;
     hLinesMid.position.y = yHorizOffset;
     var hLinesRight = new THREE.Mesh(linesGeom, lineMaterial);
-    hLinesRight.position.x = 55;
+    hLinesRight.scale.x = horizGridScale;
+    hLinesRight.position.x = 125;
     hLinesRight.position.y = yHorizOffset;
 
-    this.scene.add(hLinesLeft);
-    this.scene.add(hLinesMid);
-    this.scene.add(hLinesRight);
+    scaleGroup.add(hLinesLeft);
+    scaleGroup.add(hLinesMid);
+    scaleGroup.add(hLinesRight);
 
-    var planeHeight = 36;
-    var yOffset = 8.25;
+    var planeHeight = 70;
+    var yOffset = 0;
     var xOffset = -0.9;
     linesGeom = new THREE.PlaneGeometry(planeHeight, 5);
     var redLineMaterial = new THREE.MeshLambertMaterial( {color : 0xff0000} );
@@ -270,9 +319,10 @@ Oscilloscope.prototype.createScene = function() {
     vLinesBottom.position.y = -planeHeight + yOffset;
     vLinesBottom.rotation.z = Math.PI/2;
 
-    this.scene.add(vLinesTop);
-    this.scene.add(vLinesMid);
-    this.scene.add(vLinesBottom);
+    scaleGroup.add(vLinesTop);
+    scaleGroup.add(vLinesMid);
+    scaleGroup.add(vLinesBottom);
+    this.scene.add(scaleGroup);
 
     var dataGroup = new THREE.Object3D();
     dataGroup.name = 'dataStreams';
@@ -281,6 +331,15 @@ Oscilloscope.prototype.createScene = function() {
     this.dataGroup = dataGroup;
 
     this.camera.position.set( 0, 0, 110 );
+
+    //Test
+    /*
+    var boxGeom = new THREE.BoxGeometry(2, 2, 2);
+    var boxMat = new THREE.MeshLambertMaterial( {color:0xff0000});
+    var box = new THREE.Mesh(boxGeom, boxMat);
+    box.position.y = 40;
+    this.scene.add(box);
+    */
 };
 
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
@@ -390,8 +449,11 @@ Oscilloscope.prototype.displayStreams = function(streams) {
         lineMesh.name = 'lineMesh'+channel;
         lineMesh.frustumCulled = false;
         this.dataGroup.add(lineMesh);
-        this.channels.push( {name: '', type: 'float', enabled: true, maxBound: false, minBound: false, geometry: geometry, indexPos: 0, maxIndex: this.numPoints, vertexPos: 0, position: positions } );
+        this.channels.push( {name: streams[channel].name, type: streams[channel].type, enabled: true, maxBound: false, minBound: false, geometry: geometry, indexPos: 0, maxIndex: this.numPoints, vertexPos: 0, position: positions } );
     }
+
+    //Fill text fields with stream names
+    populateChannels(streams);
 };
 
 $(document).ready(function() {
