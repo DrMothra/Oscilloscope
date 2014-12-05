@@ -91,6 +91,12 @@ canvas {
     text-align: center;
     margin: 15px 0;
 }
+.childTitle {
+    font-size: 1.1em;
+    font-family: sans-serif;
+    text-align: center;
+    margin: 2% 0;
+}
 .header {
     margin-top: 0;
 }
@@ -174,6 +180,7 @@ canvas {
 }
 .dialControl {
     padding: 0;
+    margin-bottom: 10%;
 }
 .controlTitle {
     width: 90%;
@@ -220,6 +227,7 @@ canvas {
     margin-top: 30px;
 }
 #waitConnection,
+#waiting,
 #connectionError {
     position: fixed;
     width: 25%;

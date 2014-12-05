@@ -114,7 +114,7 @@ Oscilloscope.prototype.init = function(container) {
     this.playHead = 0;
     this.numDisplayChannels = 5;
     this.maxDisplayDigits = 6;
-    this.startPosition = 75;
+    this.startPosition = 150;
     this.timeScale = 1;
     this.yScale = 1;
     this.maxDataValue = 40;
@@ -330,14 +330,12 @@ Oscilloscope.prototype.createScene = function() {
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
 
-    this.camera.position.set( 0, 0, 110 );
-
     //Test
     /*
     var boxGeom = new THREE.BoxGeometry(2, 2, 2);
     var boxMat = new THREE.MeshLambertMaterial( {color:0xff0000});
     var box = new THREE.Mesh(boxGeom, boxMat);
-    box.position.y = 40;
+    box.position.y = 100;
     this.scene.add(box);
     */
 };
@@ -349,7 +347,7 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
     if(value > changeValue) inc = scaleFactor;
     if(value < changeValue) inc = -scaleFactor;
 
-    var streams = this.scene.getObjectByName('dataStreams');
+    var streams = this.scene.getObjectByName('dataStreams', true);
     if(streams) {
         //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
         streams.scale.y += inc;
@@ -360,16 +358,11 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
 Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     //Adjust time scale
     var inc = 0;
-    var scaleFactor = 0.01;
+    var scaleFactor = 0.025;
     if(value > changeValue) inc = scaleFactor;
     if(value < changeValue) inc = -scaleFactor;
 
-    var streams = this.scene.getObjectByName('dataStreams');
-    if(streams) {
-        //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
-        streams.scale.x += inc;
-        if(streams.scale.x <= 0) streams.scale.x = 0.01;
-    }
+    this.timeScale += inc;
 };
 
 Oscilloscope.prototype.onYShift = function(value, changeValue) {
@@ -415,8 +408,25 @@ Oscilloscope.prototype.subscribe = function(channelName) {
         "sub-c-2eafcf66-c636-11e3-8dcd-02ee2ddab7fe",
         1000,
         300);
+
+    //Tell user that we are waiting
+    $('#waiting').show();
+    var _this = this;
+    this.waitTimer = setInterval(function() {
+            _this.checkConnection()}, 1000
+    );
 };
 
+Oscilloscope.prototype.checkConnection = function() {
+    //See if we have subscribed
+    var channels = this.channel.getChannelNames();
+    if(channels != null) {
+        console.log("Got data");
+        this.subscribed = true;
+        $('#waiting').hide();
+        clearInterval(this.waitTimer);
+    }
+};
 
 Oscilloscope.prototype.displayStreams = function(streams) {
     //Display data for given channel
@@ -473,20 +483,33 @@ $(document).ready(function() {
         stopper : false,
         change : function(value) {
             app.onScaleAmplitude(value, this.cv);
+        },
+        format: function(value) {
+            return 'Amplitude';
         }
     });
 
     $('#timeScale').knob({
         change : function(value) {
             app.onScaleTime(value, this.cv);
+        },
+        format: function(value) {
+            return 'Time';
         }
     });
 
     $('#yShift').knob({
         change : function(value) {
             app.onYShift(value, this.cv);
+        },
+        format: function(value) {
+            return 'Y-Shift';
         }
     });
+
+    $('#ampScale').css('font-size', '10px');
+    $('#timeScale').css('font-size', '10px');
+    $('#yShift').css('font-size', '10px');
 
     $('#timeBack').on("click", function(evt) {
         app.showPreviousTime();

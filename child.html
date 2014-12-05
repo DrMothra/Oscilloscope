@@ -23,14 +23,14 @@
 <!-- Stats output -->
 <div id="Stats-output">
 </div>
-<div class="pure-g mainTitle">
-    <div class="pure-u-1-8">
-
+<div class="pure-g childTitle">
+    <div class="pure-u-1-6 centred">
+        <span>Streams</span>
     </div>
-    <div class="pure-u-5-8 centred">
+    <div class="pure-u-2-3 centred">
         <span>Oscilloscope - Child</span>
     </div>
-    <div class="pure-u-1-4 centred">
+    <div class="pure-u-1-6 centred">
         <span>Output Controls</span>
     </div>
 </div>
@@ -48,31 +48,70 @@
                 </div>
             </div>
         </div>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-3-8 centred">
+                    <input type="text" id="streamName2" class="streamChildName" size="5">
+                </div>
+                <div class="pure-u-5-8 childValue">
+                    <span id="streamValue2" class="valueChildDisplay">000000</span>
+                    <img id="indicatorUpStream2" class="indicator" src="images/arrowUp.png">
+                    <img id="indicatorDownStream2" class="indicator" src="images/arrowDown.png">
+                </div>
+            </div>
+        </div>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-3-8 centred">
+                    <input type="text" id="streamName3" class="streamChildName" size="5">
+                </div>
+                <div class="pure-u-5-8 childValue">
+                    <span id="streamValue3" class="valueChildDisplay">000000</span>
+                    <img id="indicatorUpStream3" class="indicator" src="images/arrowUp.png">
+                    <img id="indicatorDownStream3" class="indicator" src="images/arrowDown.png">
+                </div>
+            </div>
+        </div>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-3-8 centred">
+                    <input type="text" id="streamName4" class="streamChildName" size="5">
+                </div>
+                <div class="pure-u-5-8 childValue">
+                    <span id="streamValue4" class="valueChildDisplay">000000</span>
+                    <img id="indicatorUpStream4" class="indicator" src="images/arrowUp.png">
+                    <img id="indicatorDownStream4" class="indicator" src="images/arrowDown.png">
+                </div>
+            </div>
+        </div>
+        <div class="infoCell">
+            <div class="pure-g">
+                <div class="pure-u-3-8 centred">
+                    <input type="text" id="streamName5" class="streamChildName" size="5">
+                </div>
+                <div class="pure-u-5-8 childValue">
+                    <span id="streamValue5" class="valueChildDisplay">000000</span>
+                    <img id="indicatorUpStream5" class="indicator" src="images/arrowUp.png">
+                    <img id="indicatorDownStream5" class="indicator" src="images/arrowDown.png">
+                </div>
+            </div>
+        </div>
     </div>
     <div id="WebGL-output" class="pure-u-2-3">
 
     </div>
     <div id="controlContainer" class="controls pure-u-1-6">
         <div class="centred dialControl">
-            <input id="ampScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
+            <input id="ampScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
                    data-cursor=true data-min="1">
-        </div>
-        <div class="headerContainer centred">
-            <span class="header">Amplitude</span>
         </div>
         <div class="centred dialControl">
-            <input id="timeScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
+            <input id="timeScale" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
                    data-cursor=true data-min="1">
-        </div>
-        <div class="headerContainer centred">
-            <span class="header">Time</span>
         </div>
         <div class="centred dialControl">
-            <input id="yShift" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="false"
+            <input id="yShift" value="1" data-width="90" data-height="90" data-thickness=".3" data-fgColor="#222222" data-bgColor="#FFFFFF" data-displayInput="true"
                    data-cursor=true data-min="1">
-        </div>
-        <div class="headerContainer centred">
-            <span class="header">Y-Shift</span>
         </div>
     </div>
 </div>
@@ -90,6 +129,11 @@
     <div class="pure-u-1-5">
 
     </div>
+</div>
+<div id="waiting" class="centred hide errorBackground errorFont rounded">
+    <p>
+        Waiting for data...
+    </p>
 </div>
 </body>
 </html>

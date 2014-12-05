@@ -539,8 +539,8 @@ Oscilloscope.prototype.displayChannel = function(id) {
 
     //Update visible channels
     this.numVisChannels = 0;
-    for(var i=0; i<this.numStreams; ++i) {
-        this.channels[chan].enabled ? ++this.numVisChannels : null;
+    for(var i=0; i<this.channels.length; ++i) {
+        this.channels[i].enabled ? ++this.numVisChannels : null;
     }
 
     //Update status
@@ -672,8 +672,13 @@ Oscilloscope.prototype.createChildWindow = function() {
     var childHeight = window.innerHeight/2;
 
     var props = 'height='+childHeight+' width='+childWidth+' location=0';
+    //Get all enabled streams
     var channels = [];
-    channels.push( {name: 'wave', type: 'int'} );
+    for(var i=0; i<this.channels.length; ++i) {
+        if(this.channels[i].enabled) {
+            channels.push( {name: this.channels[i].name, type: this.channels[i].type} );
+        }
+    }
     window.visData = { channelName: this.channelName, streams: channels};
     window.open("child.html", '_blank', props);
 };
@@ -844,21 +849,31 @@ $(document).ready(function() {
             app.onScaleAmplitude(value, this.cv);
         },
         format: function(value) {
-            return 'Amp';
+            return 'Amplitude';
         }
     });
 
     $('#timeScale').knob({
         change : function(value) {
             app.onScaleTime(value, this.cv);
+        },
+        format: function(value) {
+            return 'Time';
         }
     });
 
     $('#yShift').knob({
         change : function(value) {
             app.onYShift(value, this.cv);
+        },
+        format: function(value) {
+            return 'Y-Shift';
         }
     });
+
+    $('#ampScale').css('font-size', '15px');
+    $('#timeScale').css('font-size', '15px');
+    $('#yShift').css('font-size', '15px');
 
     $('#timeBack').on("click", function(evt) {
         app.showPreviousTime();
