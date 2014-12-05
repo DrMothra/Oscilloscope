@@ -842,6 +842,9 @@ $(document).ready(function() {
         stopper : false,
         change : function(value) {
             app.onScaleAmplitude(value, this.cv);
+        },
+        format: function(value) {
+            return 'Amp';
         }
     });
 

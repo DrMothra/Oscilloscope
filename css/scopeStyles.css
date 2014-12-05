@@ -97,6 +97,11 @@ canvas {
 .headerContainer {
     margin-bottom: 10%;
 }
+.fixedContainer {
+    position: absolute;
+    top: 14%;
+    right: 8%;
+}
 .channelHeader {
     text-align: center;
     margin: 10px 0;
