@@ -148,6 +148,7 @@ Oscilloscope.prototype.init = function(container) {
     this.startPosition = 150;
 
     this.numDisplayChannels = 14;
+    this.channelNames = [];
     //Line colours
     this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
         0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
@@ -187,9 +188,11 @@ Oscilloscope.prototype.update = function() {
     */
 
     //Update enabled channels
-    for(var i=0; i<this.channels.length; ++i) {
-        if(this.channels[i].enabled) {
-            this.updateChannel(i);
+    if(this.subscribed) {
+        for(var i=0; i<this.channelNames.length; ++i) {
+            if(this.channels[i].enabled) {
+                this.updateChannel(i);
+            }
         }
     }
 
@@ -529,17 +532,18 @@ Oscilloscope.prototype.displayChannel = function(id) {
     //Get channel id
     var chanId = id.substr(6, 2);
     var channelName = $('#streamName'+chanId).val();
+    if(!channelName) return;
 
     var chan = parseInt(chanId);
     if(!isNaN(chan)) --chan;
 
-    if(chan < 0 || chan >= this.channels.length) return;
+    if(chan < 0 || chan >= this.channelNames.length) return;
 
     this.channels[chan].enabled = !this.channels[chan].enabled;
 
     //Update visible channels
     this.numVisChannels = 0;
-    for(var i=0; i<this.channels.length; ++i) {
+    for(var i=0; i<this.channelNames.length; ++i) {
         this.channels[i].enabled ? ++this.numVisChannels : null;
     }
 
@@ -624,20 +628,23 @@ Oscilloscope.prototype.showNextTime = function(value) {
 
 Oscilloscope.prototype.toggleSelectAll = function() {
     this.allSelected = !this.allSelected;
-    var line;
-    var visChannels = 0;
-    for(var i=0; i<this.dataStreams.length; ++i) {
-        line = this.scene.getObjectByName('lineMesh'+i, true);
-        if(line) {
-            line.visible = this.allSelected;
-            if(line.visible) ++visChannels;
-            this.dataStreams[i].enabled = line.visible;
-            var channel = i+1;
-            var elem = 'chan'+channel+'Status';
-            $('#'+elem).css('background-color', line.visible ? '#00ff00' : '#ff0000');
+    var image = this.allSelected ? 'images/green_circle.png' : 'images/red_circle.png';
+    var elem;
+    var stream;
+    for(var i=0; i<this.channelNames.length; ++i) {
+        stream = i+1;
+        elem = $('#streamStatus'+stream);
+        elem.attr('src', image);
+        this.channels[i].enabled = this.allSelected;
+        //Update indicators
+        if(!this.channels[i].enabled) {
+            updateBoundsIndicator(false, true, i+1);
+            this.channels[i].maxBound = false;
+            updateBoundsIndicator(false, false, i+1);
+            this.channels[i].minBound = false;
         }
     }
-    this.numVisChannels = line.visible ? visChannels : 0;
+    this.numVisChannels = this.allSelected ? this.channelNames.length : 0;
 };
 
 Oscilloscope.prototype.autoSeparate = function() {
@@ -722,6 +729,7 @@ Oscilloscope.prototype.toggleScale = function() {
 
 Oscilloscope.prototype.validateChannel = function() {
     //Reset
+    this.subscribed = false;
     this.resetStreams();
 
     //Subscribe to pubnub channel
@@ -742,14 +750,15 @@ Oscilloscope.prototype.validateChannel = function() {
 
 Oscilloscope.prototype.checkConnection = function() {
     //See if we have subscribed
-    var channels = this.channel.getChannelNames();
-    if(channels != null) {
+    this.channelNames = this.channel.getChannelNames();
+    if(this.channelNames != null) {
         console.log("Got channels");
         this.subscribed = true;
         $('#waitConnection').hide();
+        if(this.channelNames.length > this.numDisplayChannels) this.channelNames.length = this.numDisplayChannels;
         clearInterval(this.waitTimer);
-        this.populateChannels(channels);
-        this.updateChannelNames(channels);
+        this.populateChannels(this.channelNames);
+        this.updateChannelNames(this.channelNames);
         this.updateChannelTypes(this.channel.getChannelTypes());
         this.connectionAttempts = 0;
         $('#titleData').html('Output - ' +this.channelName);
@@ -786,7 +795,7 @@ Oscilloscope.prototype.resetStreams = function() {
     //Clear display
     var elem;
     var stream;
-    for(var i=0; i<this.channels.length; ++i) {
+    for(var i=0; i<this.channelNames.length; ++i) {
         stream = i+1;
         elem = $('#streamName'+stream);
         elem.html('');
