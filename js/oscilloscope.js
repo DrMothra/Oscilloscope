@@ -721,6 +721,9 @@ Oscilloscope.prototype.toggleScale = function() {
 };
 
 Oscilloscope.prototype.validateChannel = function() {
+    //Reset
+    this.resetStreams();
+
     //Subscribe to pubnub channel
     this.channelName = $('#channelName').val();
     this.channel = PubNubBuffer.subscribe(this.channelName,
@@ -745,7 +748,7 @@ Oscilloscope.prototype.checkConnection = function() {
         this.subscribed = true;
         $('#waitConnection').hide();
         clearInterval(this.waitTimer);
-        populateChannels(channels);
+        this.populateChannels(channels);
         this.updateChannelNames(channels);
         this.updateChannelTypes(this.channel.getChannelTypes());
         this.connectionAttempts = 0;
@@ -765,19 +768,56 @@ Oscilloscope.prototype.checkConnection = function() {
 
 Oscilloscope.prototype.updateChannelNames = function(channels) {
     //Update channel structure with names
-    for(var i=0; i<channels.length; ++i) {
+    var maxChan = channels.length < this.numDisplayChannels ? channels.length : this.numDisplayChannels;
+    for(var i=0; i<maxChan; ++i) {
         this.channels[i].name = channels[i];
     }
 };
 
 Oscilloscope.prototype.updateChannelTypes = function(channels) {
     //Update channel structure with types
-    for(var i=0; i<channels.length; ++i) {
+    var maxChan = channels.length < this.numDisplayChannels ? channels.length : this.numDisplayChannels;
+    for(var i=0; i<maxChan; ++i) {
         this.channels[i].type = channels[i];
     }
 };
 
-function populateChannels(channels) {
+Oscilloscope.prototype.resetStreams = function() {
+    //Clear display
+    var elem;
+    var stream;
+    for(var i=0; i<this.channels.length; ++i) {
+        stream = i+1;
+        elem = $('#streamName'+stream);
+        elem.html('');
+        elem = $('#streamStatus'+stream);
+        elem.attr('src', 'images/red_circle.png');
+        elem = $('#streamValue'+stream);
+        elem.html('000000');
+        elem.css('padding-left', '0.5em');
+        elem = $('#indicatorUpStream'+stream);
+        elem.attr('src', 'images/arrowUp.png');
+        elem = $('#indicatorDownStream'+stream);
+        elem.attr('src', 'images/arrowDown.png');
+        this.channels[i].enabled = false;
+        this.channels[i].indexPos = 0;
+        this.channels[i].vertexPos = 0;
+    }
+
+    //Reset variables
+    this.numVisChannels = 0;
+    this.timeScale = 1;
+    this.yScale = 1;
+    var dataGroup = this.scene.getObjectByName('dataStreams', true);
+    if(dataGroup) {
+        dataGroup.position.y = 0;
+    }
+    $('#ampScale').val(1).trigger('change');
+    $('#timeScale').val(1).trigger('change');
+    $('#yShift').val(1).trigger('change');
+};
+
+Oscilloscope.prototype.populateChannels = function(channels) {
     //Clear channels
     var chan;
     for(chan=1; chan<=this.numDisplayChannels; ++chan) {
@@ -786,11 +826,12 @@ function populateChannels(channels) {
     }
     //Fill channel names
     var streamName;
-    for(chan=1; chan<=channels.length; ++chan) {
+    var maxChan = channels.length < this.numDisplayChannels ? channels.length : this.numDisplayChannels;
+    for(chan=1; chan<=maxChan; ++chan) {
         streamName = 'streamName' + chan;
         $('#'+streamName).val(channels[chan-1]);
     }
-}
+};
 
 function updateDisplay(channel, data, type, maxDigits) {
     //Update data display
