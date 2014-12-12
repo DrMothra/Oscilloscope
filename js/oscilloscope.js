@@ -468,7 +468,6 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
         var channelData = this.channels[chanNumber];
-
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
         var delta = this.clock.getDelta();
@@ -497,7 +496,7 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
             console.log('Indicator updated');
         }
         if(this.channels[chanNumber].minBound != boundLower) {
-            updateBoundsIndicator(boundUpper, false, chanNumber+1);
+            updateBoundsIndicator(boundLower, false, chanNumber+1);
             //DEBUG
             console.log('Indicator updated');
         }
@@ -795,6 +794,8 @@ Oscilloscope.prototype.resetStreams = function() {
     //Clear display
     var elem;
     var stream;
+    if(this.channelNames == null) return;
+
     for(var i=0; i<this.channelNames.length; ++i) {
         stream = i+1;
         elem = $('#streamName'+stream);
