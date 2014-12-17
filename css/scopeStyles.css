@@ -137,11 +137,11 @@ canvas {
 .valueDisplay {
     background: black;
     color: white;
-    padding: 2% 5% 2% 0.5em;
+    padding: 1% 5%;
     margin: 0;
     vertical-align: text-bottom;
     border-radius: 5px;
-    font-size: 1em;
+    font-size: 0.9vw;
 }
 .valueChildDisplay {
     background: black;

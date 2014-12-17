@@ -849,11 +849,11 @@ function updateDisplay(channel, data, type, maxDigits) {
     var elem = $('#streamValue'+channel);
     var digits = getValueRange(data);
     if(digits == null) {
-        data = data.toExponential(1);
+        data = data.toExponential(2);
     } else if(type == 'int') {
         if(digits < maxDigits) {
             //Pad out number
-            var pad = (maxDigits-digits)*0.66;
+            var pad = (maxDigits-digits)*0.75;
             pad += 'em';
             elem.css('padding-left', pad);
         }
