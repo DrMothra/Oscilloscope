@@ -85,6 +85,8 @@ function getValueRange(number) {
     var range = 10;
     var maxRange = 1000000;
     var rangeFound = false;
+    //Take negative numbers into account
+    if(number < 0) number *= -1;
 
     if(number >= maxRange) return null;
 
@@ -131,7 +133,7 @@ Oscilloscope.prototype.init = function(container) {
 
     this.iterations = 0;
 
-    this.maxDisplayDigits = 6;
+    this.maxDisplayDigits = 7;
     this.gridVisible = true;
     this.scaleVisible = true;
     this.yScale = 1;
@@ -467,6 +469,8 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
+        //DEBUG
+        data = 88888888;
         var channelData = this.channels[chanNumber];
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
@@ -848,14 +852,21 @@ function updateDisplay(channel, data, type, maxDigits) {
     //Format data
     var elem = $('#streamValue'+channel);
     var digits = getValueRange(data);
+    var positive = 1;
+    if(data < 0) {
+        maxDigits--;
+        positive = 0;
+    }
+
     if(digits == null) {
-        data = data.toExponential(2);
+        data = data.toExponential(1);
     } else if(type == 'int') {
         if(digits < maxDigits) {
             //Pad out number
-            var pad = (maxDigits-digits)*0.75;
-            pad += 'em';
-            elem.css('padding-left', pad);
+            var spaces = (maxDigits-digits)*2 - positive;
+            for(var i=0; i<spaces; ++i) {
+                data = '&nbsp' + data;
+            }
         }
     } else if(type == 'float') {
         if(digits < maxDigits) {

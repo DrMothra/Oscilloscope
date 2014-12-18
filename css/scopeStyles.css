@@ -60,6 +60,9 @@ canvas {
 .hide {
     display: none;
 }
+.black {
+    color: #000000;
+}
 #channelName {
 
 }
