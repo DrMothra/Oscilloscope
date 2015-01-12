@@ -27,7 +27,14 @@
 </div>
 <div class="pure-g mainTitle">
     <div class="pure-u-1-5 centred">
-        <span>Data Controls</span>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <img src="images/info.png" id="help" class="imageInfo">
+            </div>
+            <div class="pure-u-4-5">
+                <span>Data Controls</span>
+            </div>
+        </div>
     </div>
     <div class="pure-u-3-5 centred">
         <span id="titleData">Output - (No Data)</span>
@@ -317,7 +324,15 @@
 
     </div>
     <!-- Div which will hold the Output -->
-    <div id="WebGL-output" class="pure-u-3-5">
+    <div id="output" class="pure-u-3-5">
+        <div id="WebGL-output">
+
+        </div>
+        <div class="timeControls centred">
+            <button id="timeBack" class="playBack"><img src="images/backward.png"></button>
+            <button id="timePause" class="playBack"><img src="images/pause.png"></button>
+            <button id="timeForward" class="playBack"><img src="images/forward.png"></button>
+        </div>
     </div>
     <!-- Controls -->
     <div id="controlContainer" class="controls pure-u-1-5">
@@ -335,21 +350,7 @@
         </div>
     </div>
 </div>
-<div class="footer pure-g">
-    <div class="pure-u-1-5">
 
-    </div>
-    <div class="pure-u-3-5">
-        <div class="timeControls centred">
-            <button id="timeBack" class="playBack"><img src="images/backward.png"></button>
-            <button id="timePause" class="playBack"><img src="images/pause.png"></button>
-            <button id="timeForward" class="playBack"><img src="images/forward.png"></button>
-        </div>
-    </div>
-    <div class="pure-u-1-5">
-
-    </div>
-</div>
 <div id="waitConnection" class="centred hide infoBackground infoFont rounded">
     <p>
         Establishing a connection, please wait...

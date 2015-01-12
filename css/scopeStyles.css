@@ -38,8 +38,12 @@ canvas {
     overflow: hidden;
 }
 .button-xxsmall {
-    font-size: 35%;
-    padding: 0;
+    width: 5%;
+    font-size: 0.7em;
+    padding: 1% 0;
+    border-radius: 5px;
+    border: none;
+    margin-left: 1%;
 }
 .button-xsmall {
     width: 50%;
@@ -209,6 +213,9 @@ canvas {
 }
 .errorBackground {
     background: #a7a7a7;
+}
+.imageInfo {
+    width: 50%;
 }
 .infoFont {
     color: #1b8de7;
