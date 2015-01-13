@@ -214,6 +214,15 @@ canvas {
 .errorBackground {
     background: #a7a7a7;
 }
+a.nolinks:link, a.nolinks:active, a.nolinks:hover {
+    text-decoration: none;
+    color: #000000;
+}
+a.nolinks:visited {
+    text-decoration: none;
+    color: transparent;
+    border: none;
+}
 .imageInfo {
     width: 50%;
 }
@@ -247,4 +256,17 @@ canvas {
 }
 #errorOK {
     margin-top: 3%;
+}
+
+/* Instruction page */
+#instructions {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#mainTitle {
+    font-size: 2em;
+    text-align: center;
+    margin: 1% 0 1% 0;
+}
+p {
+    margin-bottom: 1%;
 }

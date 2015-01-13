@@ -7,10 +7,40 @@
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
     <link href="css/scopeStyles.css?v=0.2" rel="stylesheet" type="text/css">
 </head>
-<body>
-<h1>Oscilloscope Instructions</h1>
-<p>
-    Welcome to the oscilloscope page, here you'll find all the instructions regarding how to visualise your data with the oscilloscope app.
-</p>
+<body id="instructions">
+<div id="mainTitle">
+    <span>Oscilloscope Instructions</span>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1-12">
+
+    </div>
+    <div class="pure-u-4-5">
+        <p>
+            Welcome to the oscilloscope application page, here you'll find all the instructions to visualise your data.<br>
+            At the moment the app will only visualise data from pubnub, hopefully in the future it will visualise data from other sources.
+        </p>
+        <p>
+            Enter the name of the relevant pubnub channel in the channel name at the top left and press enter.<br>
+            You'll then receive a message asking you to wait until the app has retrieved all the information from pubnub about your channel.<br>
+            If this is successful then the stream names will become populated with the relevant information.<br>
+            If you then click the Enable button next to the relevant stream then you should see the data being displayed, with the numeric value shown in the black box.
+        </p>
+        <p>
+            The jogger wheels do the following:<br>
+            Amplitude - scales the output accordingly<br>
+            Time - scales the time axis accordingly<br>
+            Y-Shift - moves the data up and down the screen.
+        </p>
+        <p>
+            If you can't see your data and one of the arrows is illuminated next to your enabled channel then it means that the values are beyond the currently displayed limits.<br>
+            If you adjust the Amplitude jogger wheel then it should come into view, or alternatively use the Y-Shift to move the data around the screen.
+        </p>
+    </div>
+    <div class="pure-u-1-12">
+
+    </div>
+</div>
+
 </body>
 </html>

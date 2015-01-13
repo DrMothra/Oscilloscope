@@ -470,7 +470,7 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
         //DEBUG
-        data = 8888888;
+        data = 888888;
         var channelData = this.channels[chanNumber];
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
@@ -871,6 +871,7 @@ function updateDisplay(channel, data, type, maxDigits) {
             }
         }
     } else if(type == 'float') {
+        maxDigits--;
         if(digits < maxDigits) {
             data = data.toFixed(maxDigits-digits);
         }
