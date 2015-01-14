@@ -144,11 +144,22 @@ canvas {
 .valueDisplay {
     background: black;
     color: white;
-    padding: 1% 5%;
     margin: 0;
     vertical-align: text-bottom;
     border-radius: 5px;
     font-size: 0.9vw;
+}
+.numericDisplay {
+    padding: 1% 5%;
+}
+.scaleDisplay {
+    padding: 1%;
+}
+.narrow {
+    width: 12.5%;
+}
+.autoCentre {
+    margin: 0 auto;
 }
 .valueChildDisplay {
     background: black;
@@ -187,7 +198,7 @@ canvas {
 }
 .dialControl {
     padding: 0;
-    margin-bottom: 10%;
+    margin-bottom: 20%;
 }
 .controlTitle {
     width: 90%;

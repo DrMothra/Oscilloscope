@@ -469,8 +469,6 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
-        //DEBUG
-        data = 888888;
         var channelData = this.channels[chanNumber];
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
@@ -576,9 +574,9 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
         //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
         streams.scale.y += inc;
         if(streams.scale.y <= 0) streams.scale.y = 0.01;
-        this.yScale = streams.scale.y;
-        //DEBUG
-        console.log('Scale =', this.yScale);
+        this.yScale = streams.scale.y.toFixed(2);
+        //Output value
+        $('#ampScaleValue').html(this.yScale);
     }
 };
 
@@ -590,6 +588,8 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     if(value < changeValue) inc = -scaleFactor;
 
     this.timeScale += inc;
+    //Output value
+    $('#timeScaleValue').html(this.timeScale.toFixed(2));
 };
 
 Oscilloscope.prototype.onYShift = function(value, changeValue) {
@@ -602,6 +602,8 @@ Oscilloscope.prototype.onYShift = function(value, changeValue) {
     var dataGroup = this.scene.getObjectByName('dataStreams', true);
     if(dataGroup) {
         dataGroup.position.y += inc;
+        //Output value
+        $('#shiftScaleValue').html(dataGroup.position.y.toFixed(2));
     }
 };
 
