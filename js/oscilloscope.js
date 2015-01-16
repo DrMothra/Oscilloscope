@@ -856,10 +856,12 @@ function updateDisplay(channel, data, type, maxDigits) {
     var digits = getValueRange(data);
     var precision = 2;
     var positive = 1;
+    var addSpace = false;
     if(data < 0) {
         maxDigits--;
         positive = 0;
         precision = 1;
+        addSpace = true;
     }
 
     if(digits == null) {
@@ -876,6 +878,11 @@ function updateDisplay(channel, data, type, maxDigits) {
         maxDigits--;
         if(digits < maxDigits) {
             data = data.toFixed(maxDigits-digits);
+        } else {
+            addSpace = true;
+        }
+        if(addSpace) {
+            data = '&nbsp' + data;
         }
     }
 
