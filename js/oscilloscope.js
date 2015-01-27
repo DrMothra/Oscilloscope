@@ -583,7 +583,7 @@ Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
 Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
     //Adjust time scale
     var inc = 0;
-    var scaleFactor = 0.025;
+    var scaleFactor = 0.1;
     if(value > changeValue) inc = scaleFactor;
     if(value < changeValue) inc = -scaleFactor;
 
@@ -858,7 +858,7 @@ function updateDisplay(channel, data, type, maxDigits) {
     var positive = 1;
     var addSpace = false;
     if(data < 0) {
-        maxDigits--;
+        --maxDigits;
         positive = 0;
         precision = 1;
         addSpace = true;

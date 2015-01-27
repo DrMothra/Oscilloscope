@@ -127,7 +127,7 @@ canvas {
 }
 .streamStatus {
     padding-top: 1%;
-    width: 20%;
+    width: 17.5%;
     vertical-align: text-bottom;
 }
 .streamName {
@@ -147,10 +147,10 @@ canvas {
     margin: 0;
     vertical-align: text-bottom;
     border-radius: 5px;
-    font-size: 0.9vw;
+    font-size: 0.82vw;
 }
 .numericDisplay {
-    padding: 1% 5%;
+    padding: 1.5% 6%;
 }
 .scaleDisplay {
     padding: 1%;
@@ -280,4 +280,30 @@ a.nolinks:visited {
 }
 p {
     margin-bottom: 1%;
+}
+.streamColour {
+    width: 0;
+    height: 0;
+    margin: 10% 0 0 0;
+}
+.green {
+    border: 7px solid lime;
+}
+.red {
+    border: 7px solid red;
+}
+.blue {
+    border: 7px solid blue;
+}
+.purple {
+    border: 7px solid purple;
+}
+.yellow {
+    border: 7px solid yellow;
+}
+.orange {
+    border: 7px solid orange;
+}
+.white {
+    border: 7px solid white;
 }
