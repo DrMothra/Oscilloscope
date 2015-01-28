@@ -34,28 +34,36 @@
 
         // LISTEN
         pubnub.subscribe({
-            channel : channel,
-            message : function(msg){
+            channel: channel,
+            message: function (msg) {
                 var now = new Date().getTime();
 
-                var data = msg.data;
-                ch.channelnames = msg.channelnames;
-                ch.channeltypes = msg.channeltypes;
+                if ("data" in msg) {
 
-                if(ch.offset === undefined){
-                    var first = data[0][0] * 1000.0;
-                    ch.offset = (now - first) + ch.latency;
-                }
+                    var data = msg.data;
 
-                for(var i = 0; i < data.length; i++){
-		            ch.timestamp_buffer[ch.index] = data[i][0]*1000.0;
-                    ch.value_buffer[ch.index] = data[i][1];
-                    ch.index++;
-                    if(ch.index > ch.size - 1){
-                        ch.index = 0;
+
+                    ch.channelnames = msg.channelnames;
+                    ch.channeltypes = msg.channeltypes;
+
+                    if (ch.offset === undefined) {
+                        var first = data[0][0] * 1000.0;
+                        ch.offset = (now - first) + ch.latency;
                     }
+
+                    for (var i = 0; i < data.length; i++) {
+                        ch.timestamp_buffer[ch.index] = data[i][0] * 1000.0;
+                        ch.value_buffer[ch.index] = data[i][1];
+                        ch.index++;
+                        if (ch.index > ch.size - 1) {
+                            ch.index = 0;
+                        }
+                    }
+                } else {
+                    console.log('Msg =', msg);
                 }
             }
+
         })
     }
 
