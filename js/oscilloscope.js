@@ -633,6 +633,10 @@ Oscilloscope.prototype.showNextTime = function(value) {
 
 Oscilloscope.prototype.toggleSelectAll = function() {
     this.allSelected = !this.allSelected;
+    this.selectAll();
+};
+
+Oscilloscope.prototype.selectAll = function() {
     var image = this.allSelected ? 'images/green_circle.png' : 'images/red_circle.png';
     var elem;
     var stream;
@@ -767,6 +771,8 @@ Oscilloscope.prototype.checkConnection = function() {
         this.updateChannelTypes(this.channel.getChannelTypes());
         this.connectionAttempts = 0;
         $('#titleData').html('Output - ' +this.channelName);
+        //Ensure enable all is consistent
+        this.selectAll();
     } else {
         ++this.connectionAttempts;
         if(this.connectionAttempts >= MAX_CONNECTION_ATTEMPTS) {
