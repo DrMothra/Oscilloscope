@@ -138,6 +138,11 @@ Oscilloscope.prototype.init = function(container) {
     this.scaleVisible = true;
     this.yScale = 1;
     this.maxDataValue = 100;
+    this.maxScaleFactorValue = 5000;
+    this.maxValueRetrieved = -10000000;
+    this.controlScale = 90000;
+    this.scaleFactorAmp = 0.01;
+    this.scaleFactorYShift = 10.0;
 
     this.deltaScale = 2;
     this.timeScale = 1;
@@ -151,6 +156,7 @@ Oscilloscope.prototype.init = function(container) {
 
     this.numDisplayChannels = 14;
     this.channelNames = [];
+
     //Line colours
     this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
         0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
@@ -469,6 +475,16 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     //Update channel
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
+        //Check max value
+        if(data > this.maxValueRetrieved) {
+            //Don't update if value too big
+            if(data < this.maxScaleFactorValue) {
+                this.maxValueRetrieved = data;
+                //this.scaleFactorAmp = (this.maxValueRetrieved / this.controlScale);
+                //this.scaleFactorYShift = this.maxValueRetrieved / 3;
+            }
+        }
+
         var channelData = this.channels[chanNumber];
         //Adjust play head
         this.dataGroup.scale.x = this.timeScale;
@@ -494,13 +510,9 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         var boundLower = data < -limit;
         if(this.channels[chanNumber].maxBound != boundUpper) {
             updateBoundsIndicator(boundUpper, true, chanNumber+1);
-            //DEBUG
-            console.log('Indicator updated');
         }
         if(this.channels[chanNumber].minBound != boundLower) {
             updateBoundsIndicator(boundLower, false, chanNumber+1);
-            //DEBUG
-            console.log('Indicator updated');
         }
         this.channels[chanNumber].maxBound = boundUpper;
         this.channels[chanNumber].minBound = boundLower;
@@ -565,13 +577,11 @@ Oscilloscope.prototype.displayChannel = function(id) {
 Oscilloscope.prototype.onScaleAmplitude = function(value, changeValue) {
     //Alter output scale
     var inc = 0;
-    var scaleFactor = 0.01;
-    if(value > changeValue) inc = scaleFactor;
-    if(value < changeValue) inc = -scaleFactor;
+    if(value > changeValue) inc = this.scaleFactorAmp;
+    if(value < changeValue) inc = -this.scaleFactorAmp;
 
     var streams = this.scene.getObjectByName('dataStreams');
     if(streams) {
-        //streams.scale.y = value > 50 ? Math.pow(value/50, scaleFactor) : Math.pow((100-value)/50, -scaleFactor);
         streams.scale.y += inc;
         if(streams.scale.y <= 0) streams.scale.y = 0.01;
         this.yScale = streams.scale.y.toFixed(2);
@@ -595,9 +605,8 @@ Oscilloscope.prototype.onScaleTime = function(value, changeValue) {
 Oscilloscope.prototype.onYShift = function(value, changeValue) {
     //Adjust y position of values
     var inc = 0;
-    var scaleFactor = 0.1;
-    if(value > changeValue) inc = scaleFactor;
-    if(value < changeValue) inc = -scaleFactor;
+    if(value > changeValue) inc = this.scaleFactorYShift;
+    if(value < changeValue) inc = -this.scaleFactorYShift;
 
     var dataGroup = this.scene.getObjectByName('dataStreams', true);
     if(dataGroup) {
