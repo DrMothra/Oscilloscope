@@ -13,7 +13,7 @@
     function Channel(channel, subscribe_key, latency, size){
 
         console.log(channel + subscribe_key);
- 
+
         this.timestamp_buffer = new Array(size);
         this.value_buffer = new Array(size);
         this.index = 0;
@@ -24,7 +24,7 @@
 
         this.channelnames = undefined;
         this.channeltypes = undefined;
- 
+
         var ch = this;
 
         // Init
@@ -100,17 +100,15 @@
         for(i=search_from; i > -1; i--){
             if(this.timestamp_buffer[i] !== undefined){
                 if(this.timestamp_buffer[i] <= due){
-                    return { data: this.value_buffer[i][channelindex],
-                        timeStamp: this.timestamp_buffer[i]};
+                    return this.value_buffer[i][channelindex];
                 }
             }
-	    }
- 
+        }
+
         for(i=this.size - 1; i > search_from ; i--){
             if(this.timestamp_buffer[i] !== undefined){
                 if(this.timestamp_buffer[i] <= due){
-                    return { data: this.value_buffer[i][channelindex],
-                        timeStamp: this.timestamp_buffer[i]};
+                    return this.value_buffer[i][channelindex];
                 }
             }
         }
@@ -129,7 +127,7 @@
 
     PubNubBuffer.subscribe = function(channel, subscribe_key, latency, size){
 
-         return new Channel(channel, subscribe_key, latency, size);
+        return new Channel(channel, subscribe_key, latency, size);
     }
 
 }).call(this);
