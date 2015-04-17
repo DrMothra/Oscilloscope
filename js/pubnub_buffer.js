@@ -38,29 +38,34 @@
             message: function (msg) {
                 var now = new Date().getTime();
 
-                if ("data" in msg) {
+                try {
+                    if ("data" in msg) {
 
-                    var data = msg.data;
+                        var data = msg.data;
 
 
-                    ch.channelnames = msg.channelnames;
-                    ch.channeltypes = msg.channeltypes;
+                        ch.channelnames = msg.channelnames;
+                        ch.channeltypes = msg.channeltypes;
 
-                    if (ch.offset === undefined) {
-                        var first = data[0][0] * 1000.0;
-                        ch.offset = (now - first) + ch.latency;
-                    }
-
-                    for (var i = 0; i < data.length; i++) {
-                        ch.timestamp_buffer[ch.index] = data[i][0] * 1000.0;
-                        ch.value_buffer[ch.index] = data[i][1];
-                        ch.index++;
-                        if (ch.index > ch.size - 1) {
-                            ch.index = 0;
+                        if (ch.offset === undefined) {
+                            var first = data[0][0] * 1000.0;
+                            ch.offset = (now - first) + ch.latency;
                         }
+
+                        for (var i = 0; i < data.length; i++) {
+                            ch.timestamp_buffer[ch.index] = data[i][0] * 1000.0;
+                            ch.value_buffer[ch.index] = data[i][1];
+                            ch.index++;
+                            if (ch.index > ch.size - 1) {
+                                ch.index = 0;
+                            }
+                        }
+                    } else {
+                        console.log('Msg =', msg);
                     }
-                } else {
-                    console.log('Msg =', msg);
+                }
+                catch (err) {
+                    console.log("Likely a sync message");
                 }
             }
 
@@ -95,7 +100,8 @@
         for(i=search_from; i > -1; i--){
             if(this.timestamp_buffer[i] !== undefined){
                 if(this.timestamp_buffer[i] <= due){
-                    return this.value_buffer[i][channelindex];
+                    return { data: this.value_buffer[i][channelindex],
+                        timeStamp: this.timestamp_buffer[i]};
                 }
             }
 	    }
@@ -103,7 +109,8 @@
         for(i=this.size - 1; i > search_from ; i--){
             if(this.timestamp_buffer[i] !== undefined){
                 if(this.timestamp_buffer[i] <= due){
-                    return this.value_buffer[i][channelindex];
+                    return { data: this.value_buffer[i][channelindex],
+                        timeStamp: this.timestamp_buffer[i]};
                 }
             }
         }
