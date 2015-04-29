@@ -4,15 +4,9 @@
     <meta charset="UTF-8">
     <title>Oscilloscope</title>
 
-    <script type="text/javascript" src="js/three.js?v=68"></script>
     <script type="text/javascript" src="js/jquery-1.9.0.js"></script>
-    <script type="text/javascript" src="js/TrackballControls.js"></script>
-    <script type="text/javascript" src="js/dat.gui.js"></script>
-    <script type="text/javascript" src="js/Blob.js"></script>
-    <script type="text/javascript" src="js/canvas-toBlob.js"></script>
-    <script type="text/javascript" src="js/FileSaver.js"></script>
-    <script type="text/javascript" src="js/baseApp.js?v=0.2"></script>
-    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/smoothie.js?v=0.1"></script>
+    <script type="text/javascript" src="js/baseSmoothApp.js?v=0.2"></script>
     <script type="text/javascript" src="js/jquery.knob.js"></script>
     <script type="text/javascript" src="js/pubnub.min.js"></script>
     <script type="text/javascript" src="js/pubnub_buffer.js?v=0.2"></script>
@@ -20,6 +14,7 @@
 
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
     <link href="css/scopeStyles.css?v=0.3" rel="stylesheet" type="text/css">
+
 </head>
 <body>
 <!-- Stats output -->
@@ -451,9 +446,9 @@
     </div>
     <!-- Div which will hold the Output -->
     <div id="output" class="pure-u-3-5">
-        <div id="WebGL-output">
+        <canvas id="WebGL-output">
 
-        </div>
+        </canvas>
         <div class="timeControls centred">
             <button id="timeBack" class="playBack"><img src="images/backward.png"></button>
             <button id="timePause" class="playBack"><img src="images/pause.png"></button>

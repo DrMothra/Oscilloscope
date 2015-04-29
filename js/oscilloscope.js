@@ -102,14 +102,14 @@ function getValueRange(number) {
     return digits;
 }
 //Init this app from base
-function Oscilloscope() {
-    BaseApp.call(this);
+function Oscilloscope(container) {
+    BaseSmoothApp.call(this, container);
 }
 
-Oscilloscope.prototype = new BaseApp();
+Oscilloscope.prototype = new BaseSmoothApp();
 
-Oscilloscope.prototype.init = function(container) {
-    BaseApp.prototype.init.call(this, container);
+Oscilloscope.prototype.init = function() {
+    BaseSmoothApp.prototype.init.call(this);
     this.dataStreams = [];
     this.updateRequired = false;
     this.guiControls = null;
@@ -144,9 +144,15 @@ Oscilloscope.prototype.init = function(container) {
     this.scaleFactorAmp = 0.01;
     this.scaleFactorYShift = 10.0;
 
+    this.channels = [];
+
     this.deltaScale = 2;
     this.timeScale = 1;
     this.numStreams = 14;
+    for(var i=0; i<this.numStreams; ++i) {
+        this.channels.push( { name: '', type: 'float', enabled: false, maxBound: false, minBound: false } );
+        this.addChannel(i);
+    }
     //Pubnub data
     this.subscribed = false;
     this.channelName = null;
@@ -156,16 +162,12 @@ Oscilloscope.prototype.init = function(container) {
 
     this.numDisplayChannels = 14;
     this.channelNames = [];
-
-    //Line colours
-    this.lineColours = [0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff,
-        0x00ff00, 0xff0000, 0x0000ff, 0xA83DFF, 0xFFE055, 0xFF8D36, 0xffffff];
 };
 
 Oscilloscope.prototype.update = function() {
     //Perform any updates
 
-    var clicked = this.mouse.down;
+    //var clicked = this.mouse.down;
 
     //Perform mouse hover
     /*
@@ -204,14 +206,14 @@ Oscilloscope.prototype.update = function() {
         }
     }
 
-    BaseApp.prototype.update.call(this);
+    BaseSmoothApp.prototype.update.call(this);
 };
 
 Oscilloscope.prototype.createScene = function() {
     //Init base createsScene
-    BaseApp.prototype.createScene.call(this);
 
     //Load background grid
+    /*
     var width = 420;
     var height = (2*width)/3;
     var gridGeom = new THREE.PlaneGeometry(width, height);
@@ -275,10 +277,12 @@ Oscilloscope.prototype.createScene = function() {
     scaleGroup.add(vLinesMid);
     scaleGroup.add(vLinesBottom);
     this.scene.add(scaleGroup);
+    */
 
     //Set up data buffers
     //Simulate a float being received at 32Hz
     //For 30 minutes
+    /*
     var sampleRate = 32;
     var numPoints = 60 * sampleRate * 30;
 
@@ -315,6 +319,7 @@ Oscilloscope.prototype.createScene = function() {
 
     this.scene.add(dataGroup);
     this.dataGroup = dataGroup;
+    */
 
     //Test
     /*
@@ -476,38 +481,21 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
     var data = this.channel.getLastValue(this.channels[chanNumber].name);
     if(data != undefined) {
         //Check max value
-        if(data > this.maxValueRetrieved) {
+        if(data.data > this.maxValueRetrieved) {
             //Don't update if value too big
-            if(data < this.maxScaleFactorValue) {
-                this.maxValueRetrieved = data;
+            if(data.data < this.maxScaleFactorValue) {
+                this.maxValueRetrieved = data.data;
                 //this.scaleFactorAmp = (this.maxValueRetrieved / this.controlScale);
                 //this.scaleFactorYShift = this.maxValueRetrieved / 3;
             }
         }
 
-        var channelData = this.channels[chanNumber];
-        //Adjust play head
-        this.dataGroup.scale.x = this.timeScale;
-        var delta = this.clock.getDelta();
-        this.totalDelta -= delta;
+        this.timeSeries[chanNumber].append(data.timeStamp, data.data);
 
-        //Adjust play head
-        var dist = (-this.totalDelta) * this.timeScale;
-        dist += this.totalDelta;
-        this.dataGroup.position.x = this.totalDelta - dist;
-        this.playHead = -this.totalDelta;
-
-        //Take starting position into account
-        this.dataGroup.position.x += this.startPosition;
-
-        channelData.position[channelData.vertexPos++] = this.playHead;
-        channelData.position[channelData.vertexPos++] = data;
-        channelData.position[channelData.vertexPos++] = 3;
-
-        updateDisplay(chanNumber+1, data, this.channels[chanNumber].type, this.maxDisplayDigits);
+        updateDisplay(chanNumber+1, data.data, this.channels[chanNumber].type, this.maxDisplayDigits);
         var limit = this.maxDataValue/this.yScale;
-        var boundUpper = data > limit;
-        var boundLower = data < -limit;
+        var boundUpper = data.data > limit;
+        var boundLower = data.data < -limit;
         if(this.channels[chanNumber].maxBound != boundUpper) {
             updateBoundsIndicator(boundUpper, true, chanNumber+1);
         }
@@ -516,14 +504,6 @@ Oscilloscope.prototype.updateChannel = function(chanNumber) {
         }
         this.channels[chanNumber].maxBound = boundUpper;
         this.channels[chanNumber].minBound = boundLower;
-
-        if(++channelData.indexPos > channelData.maxIndex) {
-            channelData.indexPos = channelData.vertexPos = 0;
-            console.log("Buffer rolled over");
-        }
-
-        channelData.geometry.offsets = [ {start: 0, count: channelData.indexPos, index: 0} ];
-        channelData.geometry.attributes.position.needsUpdate = true;
     }
 };
 
@@ -839,10 +819,7 @@ Oscilloscope.prototype.resetStreams = function() {
     this.numVisChannels = 0;
     this.timeScale = 1;
     this.yScale = 1;
-    var dataGroup = this.scene.getObjectByName('dataStreams', true);
-    if(dataGroup) {
-        dataGroup.position.y = 0;
-    }
+
     $('#ampScale').val(1).trigger('change');
     $('#timeScale').val(1).trigger('change');
     $('#yShift').val(1).trigger('change');
@@ -917,9 +894,9 @@ function updateBoundsIndicator(on_off, up_down, channel) {
 $(document).ready(function() {
     //Initialise app
     var container = document.getElementById("WebGL-output");
-    var app = new Oscilloscope();
-    app.init(container);
-    app.createScene();
+    var app = new Oscilloscope(container);
+    app.init();
+    //app.createScene();
     //app.createGUI();
 
     //GUI callbacks
@@ -932,7 +909,8 @@ $(document).ready(function() {
     });
 
     //GUI Controls
-    $('#ampScale').knob({
+    var ampScale = $('#ampScale'), timeScale = $('#timeScale'), yShift = $('#yShift');
+    ampScale.knob({
         stopper : false,
         change : function(value) {
             app.onScaleAmplitude(value, this.cv);
@@ -942,7 +920,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#timeScale').knob({
+    timeScale.knob({
         change : function(value) {
             app.onScaleTime(value, this.cv);
         },
@@ -951,7 +929,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#yShift').knob({
+    yShift.knob({
         change : function(value) {
             app.onYShift(value, this.cv);
         },
@@ -960,9 +938,9 @@ $(document).ready(function() {
         }
     });
 
-    $('#ampScale').css('font-size', '15px');
-    $('#timeScale').css('font-size', '15px');
-    $('#yShift').css('font-size', '15px');
+    ampScale.css('font-size', '15px');
+    timeScale.css('font-size', '15px');
+    yShift.css('font-size', '15px');
 
     $('#timeBack').on("click", function(evt) {
         app.showPreviousTime();
